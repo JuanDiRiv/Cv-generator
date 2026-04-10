@@ -192,7 +192,10 @@ function stripNonExperienceTail(text: string): string {
 }
 
 function normalizeExperienceDescription(text: string): string {
-  const cleaned = text.replace(/\u0000/g, "").replace(/\r/g, "").trim();
+  const cleaned = text
+    .replace(/\u0000/g, "")
+    .replace(/\r/g, "")
+    .trim();
   if (!cleaned) return "";
 
   const lines = cleaned
@@ -202,17 +205,15 @@ function normalizeExperienceDescription(text: string): string {
 
   if (lines.length === 0) return "";
 
-  const hasExplicitBullets = lines.some((line) => BULLET_PREFIX_REGEX.test(line));
-  if (!hasExplicitBullets) {
-    return lines.join("\n").trim();
-  }
-
   const items: string[] = [];
   let pendingEmptyBullet = false;
 
-  for (const line of lines) {
-    if (BULLET_PREFIX_REGEX.test(line)) {
-      const content = line.replace(BULLET_PREFIX_REGEX, "").trim();
+  for (const rawLine of lines) {
+    const hasBulletPrefix = BULLET_PREFIX_REGEX.test(rawLine);
+    const line = rawLine.replace(BULLET_PREFIX_REGEX, "").trim();
+
+    if (hasBulletPrefix) {
+      const content = line;
       if (content) {
         items.push(content);
         pendingEmptyBullet = false;
@@ -233,13 +234,22 @@ function normalizeExperienceDescription(text: string): string {
       continue;
     }
 
-    if (BULLET_START_VERB_REGEX.test(line)) {
+    const lastItemIndex = items.length - 1;
+    const previous = items[lastItemIndex] ?? "";
+    const previousLooksComplete = /[.!?]$/.test(previous);
+    const sentenceLikeStart = /^[A-ZÁÉÍÓÚÑ]/.test(line);
+    const shouldStartNewItem =
+      BULLET_START_VERB_REGEX.test(line) ||
+      (sentenceLikeStart && previousLooksComplete);
+
+    if (shouldStartNewItem) {
       items.push(line);
       continue;
     }
 
-    const lastIndex = items.length - 1;
-    items[lastIndex] = `${items[lastIndex]} ${line}`.replace(/\s+/g, " ").trim();
+    items[lastItemIndex] = `${items[lastItemIndex]} ${line}`
+      .replace(/\s+/g, " ")
+      .trim();
   }
 
   const normalizedItems = items.map((item) => item.trim()).filter(Boolean);

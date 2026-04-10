@@ -1,8 +1,5 @@
 import OpenAI from "openai";
-import {
-  normalizeImportedCV,
-  type ImportedCVPayload,
-} from "@/lib/cv-import";
+import { normalizeImportedCV, type ImportedCVPayload } from "@/lib/cv-import";
 
 export const runtime = "nodejs";
 
@@ -34,8 +31,7 @@ function hasPotentialMergedExperience(imported: ImportedCVPayload): boolean {
   const [entry] = imported.experience.entries;
   if (!entry) return false;
   const text = `${entry.title}\n${entry.description}`;
-  const dateMatches =
-    text.match(/\b(?:\d{1,2}\/\d{4}|\d{4})\b/g)?.length ?? 0;
+  const dateMatches = text.match(/\b(?:\d{1,2}\/\d{4}|\d{4})\b/g)?.length ?? 0;
   return (
     dateMatches >= 4 ||
     /\b(?:LANGUAGES|SKILLS|EDUCATION|IDIOMAS|HABILIDADES|EDUCACION|EDUCACIÓN)\b/i.test(
@@ -114,7 +110,8 @@ function mergeExperienceEntries(
   if (primary.length === 0) return recovery;
   if (recovery.length === 0) return primary;
 
-  const primaryScore = primary.length * 1000 + countExperienceTextChars(primary);
+  const primaryScore =
+    primary.length * 1000 + countExperienceTextChars(primary);
   const recoveryScore =
     recovery.length * 1000 + countExperienceTextChars(recovery);
 
@@ -157,12 +154,24 @@ function mergeImportedPayload(
     language: primary.language || recovery.language,
     title: mergeString(primary.title, recovery.title),
     contact: {
-      firstName: mergeString(primary.contact.firstName, recovery.contact.firstName),
-      lastName: mergeString(primary.contact.lastName, recovery.contact.lastName),
-      jobTitle: mergeString(primary.contact.jobTitle, recovery.contact.jobTitle),
+      firstName: mergeString(
+        primary.contact.firstName,
+        recovery.contact.firstName,
+      ),
+      lastName: mergeString(
+        primary.contact.lastName,
+        recovery.contact.lastName,
+      ),
+      jobTitle: mergeString(
+        primary.contact.jobTitle,
+        recovery.contact.jobTitle,
+      ),
       email: mergeString(primary.contact.email, recovery.contact.email),
       phone: mergeString(primary.contact.phone, recovery.contact.phone),
-      location: mergeString(primary.contact.location, recovery.contact.location),
+      location: mergeString(
+        primary.contact.location,
+        recovery.contact.location,
+      ),
       links: mergeLinks(primary.contact.links, recovery.contact.links),
     },
     about: {
@@ -263,9 +272,9 @@ async function extractStructuredCV(pdfFile: File, apiKey: string) {
     }
 
     const hints = getRecoveryHints(primary);
-    const recoveryPrompt =
-      `${BASE_USER_PROMPT} Re-read the same PDF and focus especially on missing or weak sections: ${hints.join(", ") || "all sections"
-      }. Return complete JSON with the same schema and keep bullets in experience descriptions.`;
+    const recoveryPrompt = `${BASE_USER_PROMPT} Re-read the same PDF and focus especially on missing or weak sections: ${
+      hints.join(", ") || "all sections"
+    }. Return complete JSON with the same schema and keep bullets in experience descriptions.`;
 
     try {
       const recovery = await requestImportedCV(
