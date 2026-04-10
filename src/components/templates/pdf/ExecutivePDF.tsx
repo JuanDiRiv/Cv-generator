@@ -1,4 +1,5 @@
 import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
+import { MailIcon, PhoneIcon, MapPinIcon, pdfLinkIcon } from './icons'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { withOpacity } from './color'
 
@@ -25,14 +26,41 @@ export function ExecutivePDF({ cv }: Props) {
           </View>
           {contact && (
             <View style={{ alignItems: 'flex-end' }}>
-              {contact.email && <Text style={{ fontSize: 7.5, color: '#9ca3af', marginBottom: 2 }}>{contact.email}</Text>}
-              {contact.phone && <Text style={{ fontSize: 7.5, color: '#9ca3af', marginBottom: 2 }}>{contact.phone}</Text>}
-              {contact.location && <Text style={{ fontSize: 7.5, color: '#9ca3af', marginBottom: 2 }}>{contact.location}</Text>}
-              {contact.links?.filter(l => l.label && l.url).map((l, i) => (
-                <Link key={i} src={l.url} style={{ color: accent, fontSize: 7.5, marginBottom: 3, textDecoration: 'none' }}>
-                  {l.label}
-                </Link>
-              ))}
+              {contact.email && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
+                  <Text style={{ fontSize: 7.5, color: '#9ca3af' }}>{contact.email}</Text>
+                  <View style={{ width: 9, marginLeft: 4 }}>
+                    <MailIcon size={8} color="#9ca3af" />
+                  </View>
+                </View>
+              )}
+              {contact.phone && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
+                  <Text style={{ fontSize: 7.5, color: '#9ca3af' }}>{contact.phone}</Text>
+                  <View style={{ width: 9, marginLeft: 4 }}>
+                    <PhoneIcon size={8} color="#9ca3af" />
+                  </View>
+                </View>
+              )}
+              {contact.location && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
+                  <Text style={{ fontSize: 7.5, color: '#9ca3af' }}>{contact.location}</Text>
+                  <View style={{ width: 9, marginLeft: 4 }}>
+                    <MapPinIcon size={8} color="#9ca3af" />
+                  </View>
+                </View>
+              )}
+              {contact.links?.filter(l => l.label && l.url).map((l, i) => {
+                const Icon = pdfLinkIcon(l.label)
+                return (
+                  <View key={i} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
+                    <Link src={l.url} style={{ color: accent, fontSize: 7.5, textDecoration: 'none' }}>{l.label}</Link>
+                    <View style={{ width: 9, marginLeft: 4 }}>
+                      <Icon size={8} color={accent} />
+                    </View>
+                  </View>
+                )
+              })}
             </View>
           )}
         </View>
