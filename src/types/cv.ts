@@ -4,6 +4,11 @@ export type SectionType = 'contact' | 'about' | 'experience' | 'education' | 'sk
 export type ExperienceDisplayMode = 'list' | 'timeline'
 export type SkillsDisplayMode = 'chips' | 'categories'
 
+export interface ContactLink {
+  label: string
+  url: string
+}
+
 export interface ContactData {
   firstName: string
   lastName: string
@@ -11,8 +16,7 @@ export interface ContactData {
   email: string
   phone: string
   location: string
-  linkedin?: string
-  website?: string
+  links: ContactLink[]
 }
 
 export interface AboutData {
@@ -23,6 +27,7 @@ export interface ExperienceEntry {
   id: string
   title: string
   company: string
+  location?: string
   startDate: string
   endDate: string
   current: boolean
