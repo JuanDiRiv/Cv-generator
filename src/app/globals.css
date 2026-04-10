@@ -30,9 +30,18 @@ body {
 }
 
 @media print {
-  body > *:not(#cv-print-root) { display: none !important; }
-  #cv-print-root { display: block !important; }
-  @page { margin: 0; size: A4; }
+  body>*:not(#cv-print-root) {
+    display: none !important;
+  }
+
+  #cv-print-root {
+    display: block !important;
+  }
+
+  @page {
+    margin: 0;
+    size: A4;
+  }
 }
 
 #cv-print-root {
