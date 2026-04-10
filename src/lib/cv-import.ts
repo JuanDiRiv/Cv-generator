@@ -61,6 +61,10 @@ const EXPERIENCE_STOP_HEADINGS = [
   "CERTIFICACIONES",
 ];
 
+const BULLET_PREFIX_REGEX = /^[•▪◦●\-*]\s*/;
+const BULLET_START_VERB_REGEX =
+  /^(delivered|built|automated|integrated|implemented|improved|developed|migrated|provided|led|created|designed|optimized|managed|spearheaded|engineered)\b/i;
+
 export interface ImportedCVPayload {
   language: "es" | "en";
   title: string;
@@ -185,6 +189,63 @@ function stripNonExperienceTail(text: string): string {
   const stopIndex = lines.findIndex((line) => isSectionBoundaryLine(line));
   const kept = stopIndex >= 0 ? lines.slice(0, stopIndex) : lines;
   return kept.join("\n").trim();
+}
+
+function normalizeExperienceDescription(text: string): string {
+  const cleaned = text.replace(/\u0000/g, "").replace(/\r/g, "").trim();
+  if (!cleaned) return "";
+
+  const lines = cleaned
+    .split("\n")
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+
+  if (lines.length === 0) return "";
+
+  const hasExplicitBullets = lines.some((line) => BULLET_PREFIX_REGEX.test(line));
+  if (!hasExplicitBullets) {
+    return lines.join("\n").trim();
+  }
+
+  const items: string[] = [];
+  let pendingEmptyBullet = false;
+
+  for (const line of lines) {
+    if (BULLET_PREFIX_REGEX.test(line)) {
+      const content = line.replace(BULLET_PREFIX_REGEX, "").trim();
+      if (content) {
+        items.push(content);
+        pendingEmptyBullet = false;
+      } else {
+        pendingEmptyBullet = true;
+      }
+      continue;
+    }
+
+    if (pendingEmptyBullet) {
+      items.push(line);
+      pendingEmptyBullet = false;
+      continue;
+    }
+
+    if (items.length === 0) {
+      items.push(line);
+      continue;
+    }
+
+    if (BULLET_START_VERB_REGEX.test(line)) {
+      items.push(line);
+      continue;
+    }
+
+    const lastIndex = items.length - 1;
+    items[lastIndex] = `${items[lastIndex]} ${line}`.replace(/\s+/g, " ").trim();
+  }
+
+  const normalizedItems = items.map((item) => item.trim()).filter(Boolean);
+  if (normalizedItems.length === 0) return "";
+
+  return normalizedItems.map((item) => `• ${item}`).join("\n");
 }
 
 function isLikelyRoleLine(line: string): boolean {
@@ -337,10 +398,18 @@ function normalizeExperienceEntries(
   if (cleaned.length === 1) {
     const [onlyEntry] = cleaned;
     if (!onlyEntry) return [];
-    return splitMergedExperienceEntry(onlyEntry).slice(0, 15);
+    return splitMergedExperienceEntry(onlyEntry)
+      .slice(0, 15)
+      .map((entry) => ({
+        ...entry,
+        description: normalizeExperienceDescription(entry.description),
+      }));
   }
 
-  return cleaned.slice(0, 15);
+  return cleaned.slice(0, 15).map((entry) => ({
+    ...entry,
+    description: normalizeExperienceDescription(entry.description),
+  }));
 }
 
 function asBool(value: unknown): boolean {
