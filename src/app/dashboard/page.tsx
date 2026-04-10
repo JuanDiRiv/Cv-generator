@@ -10,8 +10,7 @@ export default function DashboardPage() {
   const { user, loading, logOut } = useAuth()
   const router = useRouter()
   const [cvs, setCVs] = useState<CVDocument[]>([])
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [creatingMode, setCreatingMode] = useState<'new' | 'import' | null>(null)
+  const [creating, setCreating] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) router.replace('/')
@@ -21,20 +20,15 @@ export default function DashboardPage() {
     if (user) getUserCVs(user.uid).then(setCVs)
   }, [user])
 
-  const handleCreate = async (mode: 'new' | 'import') => {
+  const handleCreate = async () => {
     if (!user) return
     try {
-      setCreatingMode(mode)
+      setCreating(true)
       const data = newCV(user.uid)
       const id = await createCV(user.uid, data)
-      if (mode === 'import') {
-        router.push(`/cv/${id}?import=1`)
-        return
-      }
       router.push(`/cv/${id}`)
     } finally {
-      setCreatingMode(null)
-      setShowCreateModal(false)
+      setCreating(false)
     }
   }
 
@@ -63,11 +57,11 @@ export default function DashboardPage() {
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Mis CVs</h1>
           <button
-            onClick={() => setShowCreateModal(true)}
-            disabled={Boolean(creatingMode)}
+            onClick={handleCreate}
+            disabled={creating}
             className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold hover:bg-indigo-500 disabled:opacity-50"
           >
-            {creatingMode ? 'Creando…' : '+ Nuevo CV'}
+            {creating ? 'Creando…' : '+ Nuevo CV'}
           </button>
         </div>
         {cvs.length === 0 ? (
@@ -97,50 +91,6 @@ export default function DashboardPage() {
         )}
       </main>
 
-      {showCreateModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onClick={() => setShowCreateModal(false)}
-        >
-          <div
-            className="w-full max-w-xl rounded-2xl border border-zinc-800 bg-zinc-900 p-6"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <h2 className="text-lg font-bold">¿Cómo quieres empezar?</h2>
-            <p className="mt-1 text-sm text-zinc-400">Puedes crear uno desde cero o cargar un CV existente en PDF para autocompletar con IA.</p>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <button
-                onClick={() => handleCreate('import')}
-                disabled={Boolean(creatingMode)}
-                className="rounded-xl border border-zinc-700 bg-zinc-950 p-4 text-left transition hover:border-indigo-500 disabled:opacity-60"
-              >
-                <p className="text-sm font-semibold">Cargar existente</p>
-                <p className="mt-1 text-xs text-zinc-400">Sube tu CV en PDF y rellenamos el editor automáticamente.</p>
-              </button>
-
-              <button
-                onClick={() => handleCreate('new')}
-                disabled={Boolean(creatingMode)}
-                className="rounded-xl border border-zinc-700 bg-zinc-950 p-4 text-left transition hover:border-indigo-500 disabled:opacity-60"
-              >
-                <p className="text-sm font-semibold">Crear nuevo</p>
-                <p className="mt-1 text-xs text-zinc-400">Empieza con un CV en blanco y rellena las secciones manualmente.</p>
-              </button>
-            </div>
-
-            <div className="mt-5 flex justify-end">
-              <button
-                onClick={() => setShowCreateModal(false)}
-                disabled={Boolean(creatingMode)}
-                className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-300 hover:border-zinc-500 disabled:opacity-60"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

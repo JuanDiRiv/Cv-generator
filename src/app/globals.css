@@ -38,3 +38,20 @@ body {
 #cv-print-root {
   display: none;
 }
+
+button:not(:disabled),
+a[href],
+summary,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+[role="button"] {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+}
