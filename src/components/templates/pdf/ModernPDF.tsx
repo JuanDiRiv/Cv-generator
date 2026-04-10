@@ -1,5 +1,6 @@
 import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
 import { MailIcon, PhoneIcon, MapPinIcon, pdfLinkIcon } from './icons'
+import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { withOpacity } from './color'
 
@@ -13,6 +14,7 @@ export function ModernPDF({ cv }: Props) {
   const skills = cv.sections.find(s => s.type === 'skills' && s.visible)?.data as SkillsData | undefined
   const education = cv.sections.find(s => s.type === 'education' && s.visible)?.data as EducationData | undefined
   const languages = cv.sections.find(s => s.type === 'languages' && s.visible)?.data as LanguagesData | undefined
+  const labels = getPdfLabels(cv.language)
 
   return (
     <Document>
@@ -28,7 +30,7 @@ export function ModernPDF({ cv }: Props) {
           )}
           {contact && (
             <View style={{ marginBottom: 16 }}>
-              <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: 'rgba(255,255,255,0.6)', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.2)', paddingBottom: 3, marginBottom: 5 }}>CONTACTO</Text>
+              <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: 'rgba(255,255,255,0.6)', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.2)', paddingBottom: 3, marginBottom: 5 }}>{labels.contact}</Text>
               {contact.email && (
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 3 }}>
                   <View style={{ width: 9, marginRight: 4 }}>
@@ -68,7 +70,7 @@ export function ModernPDF({ cv }: Props) {
           )}
           {skills && (
             <View style={{ marginBottom: 16 }}>
-              <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: 'rgba(255,255,255,0.6)', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.2)', paddingBottom: 3, marginBottom: 6 }}>HABILIDADES</Text>
+              <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: 'rgba(255,255,255,0.6)', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.2)', paddingBottom: 3, marginBottom: 6 }}>{labels.skills}</Text>
               {skills.displayMode === 'chips' ? (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                   {skills.chips.map(chip => (
@@ -91,7 +93,7 @@ export function ModernPDF({ cv }: Props) {
           )}
           {languages && languages.entries.length > 0 && (
             <View>
-              <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: 'rgba(255,255,255,0.6)', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.2)', paddingBottom: 3, marginBottom: 5 }}>IDIOMAS</Text>
+              <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: 'rgba(255,255,255,0.6)', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.2)', paddingBottom: 3, marginBottom: 5 }}>{labels.languages}</Text>
               {languages.entries.map(l => (
                 <Text key={l.id} style={{ fontSize: 7.5, color: 'rgba(255,255,255,0.8)', marginBottom: 3 }}>{l.language} — {l.level}</Text>
               ))}
@@ -104,7 +106,7 @@ export function ModernPDF({ cv }: Props) {
           {about?.summary && (
             <View style={{ marginBottom: 14 }}>
               <View style={{ borderLeftWidth: 3, borderLeftColor: accent, paddingLeft: 6, marginBottom: 5 }}>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent }}>SOBRE MÍ</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent }}>{labels.aboutMe}</Text>
               </View>
               <Text style={{ fontSize: 8.5, color: '#52525b', lineHeight: 1.5 }}>{about.summary}</Text>
             </View>
@@ -113,7 +115,7 @@ export function ModernPDF({ cv }: Props) {
           {experience && experience.entries.length > 0 && (
             <View style={{ marginBottom: 14 }}>
               <View style={{ borderLeftWidth: 3, borderLeftColor: accent, paddingLeft: 6, marginBottom: 8 }}>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent }}>EXPERIENCIA</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent }}>{labels.experience}</Text>
               </View>
 
               {experience.displayMode === 'timeline' ? (
@@ -125,7 +127,7 @@ export function ModernPDF({ cv }: Props) {
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
                         <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#1f2937', flex: 1 }}>{entry.title}</Text>
                         <View style={{ backgroundColor: withOpacity(accent, 0.12), paddingHorizontal: 5, paddingVertical: 2, borderRadius: 3, marginLeft: 6 }}>
-                          <Text style={{ fontSize: 7, color: accent }}>{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
+                          <Text style={{ fontSize: 7, color: accent }}>{entry.startDate}{entry.current ? ` — ${labels.present}` : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
                         </View>
                       </View>
                       <Text style={{ fontSize: 8, color: accent, fontFamily: 'Helvetica-Bold', marginBottom: 3 }}>{entry.company}</Text>
@@ -140,7 +142,7 @@ export function ModernPDF({ cv }: Props) {
                     <View key={entry.id} style={{ marginBottom: i < experience.entries.length - 1 ? 10 : 0 }}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 }}>
                         <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#1f2937' }}>{entry.title}</Text>
-                        <Text style={{ fontSize: 7.5, color: '#71717a' }}>{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
+                        <Text style={{ fontSize: 7.5, color: '#71717a' }}>{entry.startDate}{entry.current ? ` — ${labels.present}` : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
                       </View>
                       <Text style={{ fontSize: 8, color: accent, fontFamily: 'Helvetica-Bold', marginBottom: 3 }}>{entry.company}</Text>
                       {entry.location && <Text style={{ fontSize: 7.5, color: '#71717a', marginBottom: 2 }}>{entry.location}</Text>}
@@ -155,7 +157,7 @@ export function ModernPDF({ cv }: Props) {
           {education && education.entries.length > 0 && (
             <View>
               <View style={{ borderLeftWidth: 3, borderLeftColor: accent, paddingLeft: 6, marginBottom: 8 }}>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent }}>EDUCACIÓN</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent }}>{labels.education}</Text>
               </View>
               {education.entries.map((entry, i) => (
                 <View key={entry.id} wrap={false} style={{ marginBottom: i < education.entries.length - 1 ? 8 : 0 }}>

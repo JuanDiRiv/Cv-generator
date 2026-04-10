@@ -1,5 +1,6 @@
 import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
 import { MailIcon, PhoneIcon, MapPinIcon, pdfLinkIcon } from './icons'
+import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { withOpacity } from './color'
 
@@ -13,6 +14,7 @@ export function BudapestPDF({ cv }: Props) {
   const skills = cv.sections.find(s => s.type === 'skills' && s.visible)?.data as SkillsData | undefined
   const education = cv.sections.find(s => s.type === 'education' && s.visible)?.data as EducationData | undefined
   const languages = cv.sections.find(s => s.type === 'languages' && s.visible)?.data as LanguagesData | undefined
+  const labels = getPdfLabels(cv.language)
 
   return (
     <Document>
@@ -41,7 +43,7 @@ export function BudapestPDF({ cv }: Props) {
 
           {contact && (
             <View style={{ marginBottom: 14 }}>
-              <Text style={{ color: accent, fontSize: 6.5, fontFamily: 'Helvetica-Bold', borderBottomWidth: 1, borderBottomColor: '#2a2a4e', paddingBottom: 3, marginBottom: 5 }}>CONTACTO</Text>
+              <Text style={{ color: accent, fontSize: 6.5, fontFamily: 'Helvetica-Bold', borderBottomWidth: 1, borderBottomColor: '#2a2a4e', paddingBottom: 3, marginBottom: 5 }}>{labels.contact}</Text>
               {contact.email && (
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 3 }}>
                   <View style={{ width: 9, marginRight: 4 }}>
@@ -82,7 +84,7 @@ export function BudapestPDF({ cv }: Props) {
 
           {skills && (
             <View style={{ marginBottom: 14 }}>
-              <Text style={{ color: accent, fontSize: 6.5, fontFamily: 'Helvetica-Bold', borderBottomWidth: 1, borderBottomColor: '#2a2a4e', paddingBottom: 3, marginBottom: 6 }}>HABILIDADES</Text>
+              <Text style={{ color: accent, fontSize: 6.5, fontFamily: 'Helvetica-Bold', borderBottomWidth: 1, borderBottomColor: '#2a2a4e', paddingBottom: 3, marginBottom: 6 }}>{labels.skills}</Text>
               {skills.displayMode === 'chips' ? (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                   {skills.chips.map(chip => (
@@ -106,7 +108,7 @@ export function BudapestPDF({ cv }: Props) {
 
           {languages && languages.entries.length > 0 && (
             <View>
-              <Text style={{ color: accent, fontSize: 6.5, fontFamily: 'Helvetica-Bold', borderBottomWidth: 1, borderBottomColor: '#2a2a4e', paddingBottom: 3, marginBottom: 5 }}>IDIOMAS</Text>
+              <Text style={{ color: accent, fontSize: 6.5, fontFamily: 'Helvetica-Bold', borderBottomWidth: 1, borderBottomColor: '#2a2a4e', paddingBottom: 3, marginBottom: 5 }}>{labels.languages}</Text>
               {languages.entries.map(l => (
                 <Text key={l.id} style={{ color: '#9ca3af', fontSize: 7.5, marginBottom: 3 }}>{l.language} — {l.level}</Text>
               ))}
@@ -127,7 +129,7 @@ export function BudapestPDF({ cv }: Props) {
           {about?.summary && (
             <View style={{ marginBottom: 14 }}>
               <View style={{ borderLeftWidth: 3, borderLeftColor: accent, paddingLeft: 6, marginBottom: 5 }}>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: '#1a1a2e' }}>SOBRE MÍ</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: '#1a1a2e' }}>{labels.aboutMe}</Text>
               </View>
               <Text style={{ fontSize: 8.5, color: '#52525b', lineHeight: 1.5 }}>{about.summary}</Text>
             </View>
@@ -136,7 +138,7 @@ export function BudapestPDF({ cv }: Props) {
           {experience && experience.entries.length > 0 && (
             <View style={{ marginBottom: 14 }}>
               <View style={{ borderLeftWidth: 3, borderLeftColor: accent, paddingLeft: 6, marginBottom: 8 }}>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: '#1a1a2e' }}>EXPERIENCIA</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: '#1a1a2e' }}>{labels.experience}</Text>
               </View>
 
               {experience.displayMode === 'timeline' ? (
@@ -157,7 +159,7 @@ export function BudapestPDF({ cv }: Props) {
                         {/* Date badge */}
                         <View style={{ backgroundColor: withOpacity(accent, 0.12), paddingHorizontal: 5, paddingVertical: 2, borderRadius: 3, marginLeft: 6 }}>
                           <Text style={{ fontSize: 7, color: accent }}>
-                            {entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}
+                            {entry.startDate}{entry.current ? ` — ${labels.present}` : entry.endDate ? ` — ${entry.endDate}` : ''}
                           </Text>
                         </View>
                       </View>
@@ -177,7 +179,7 @@ export function BudapestPDF({ cv }: Props) {
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 }}>
                           <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#1a1a2e' }}>{entry.title}</Text>
                           <Text style={{ fontSize: 7.5, color: '#71717a' }}>
-                            {entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}
+                            {entry.startDate}{entry.current ? ` — ${labels.present}` : entry.endDate ? ` — ${entry.endDate}` : ''}
                           </Text>
                         </View>
                         <Text style={{ fontSize: 8, color: accent, fontFamily: 'Helvetica-Bold', marginBottom: 3 }}>{entry.company}</Text>
@@ -194,7 +196,7 @@ export function BudapestPDF({ cv }: Props) {
           {education && education.entries.length > 0 && (
             <View>
               <View style={{ borderLeftWidth: 3, borderLeftColor: accent, paddingLeft: 6, marginBottom: 8 }}>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: '#1a1a2e' }}>EDUCACIÓN</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: '#1a1a2e' }}>{labels.education}</Text>
               </View>
               {education.entries.map((entry, i) => (
                 <View key={entry.id} wrap={false} style={{ flexDirection: 'row', gap: 6, marginBottom: i < education.entries.length - 1 ? 8 : 0 }}>

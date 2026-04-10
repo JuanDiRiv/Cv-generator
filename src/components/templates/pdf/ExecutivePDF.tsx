@@ -1,5 +1,6 @@
 import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
 import { MailIcon, PhoneIcon, MapPinIcon, pdfLinkIcon } from './icons'
+import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { withOpacity } from './color'
 
@@ -13,6 +14,7 @@ export function ExecutivePDF({ cv }: Props) {
   const skills = cv.sections.find(s => s.type === 'skills' && s.visible)?.data as SkillsData | undefined
   const education = cv.sections.find(s => s.type === 'education' && s.visible)?.data as EducationData | undefined
   const languages = cv.sections.find(s => s.type === 'languages' && s.visible)?.data as LanguagesData | undefined
+  const labels = getPdfLabels(cv.language)
 
   return (
     <Document>
@@ -72,13 +74,13 @@ export function ExecutivePDF({ cv }: Props) {
           <View style={{ flex: 1 }}>
             {about?.summary && (
               <View style={{ marginBottom: 14 }}>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, borderBottomWidth: 1, borderBottomColor: withOpacity(accent, 0.25), paddingBottom: 3, marginBottom: 6 }}>PERFIL PROFESIONAL</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, borderBottomWidth: 1, borderBottomColor: withOpacity(accent, 0.25), paddingBottom: 3, marginBottom: 6 }}>{labels.professionalProfile}</Text>
                 <Text style={{ fontSize: 8.5, color: '#52525b', lineHeight: 1.5 }}>{about.summary}</Text>
               </View>
             )}
             {experience && experience.entries.length > 0 && (
               <View>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, borderBottomWidth: 1, borderBottomColor: withOpacity(accent, 0.25), paddingBottom: 3, marginBottom: 8 }}>EXPERIENCIA</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, borderBottomWidth: 1, borderBottomColor: withOpacity(accent, 0.25), paddingBottom: 3, marginBottom: 8 }}>{labels.experience}</Text>
                 {experience.displayMode === 'timeline' ? (
                   <View style={{ position: 'relative', paddingLeft: 12 }}>
                     <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 1, backgroundColor: accent }} />
@@ -87,7 +89,7 @@ export function ExecutivePDF({ cv }: Props) {
                         <View style={{ position: 'absolute', left: -16, top: 2, width: 8, height: 8, borderRadius: 4, backgroundColor: i === 0 ? accent : '#ffffff', borderWidth: 1, borderColor: accent }} />
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
                           <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#1f2937', flex: 1 }}>{entry.title}</Text>
-                          <Text style={{ fontSize: 7.5, color: accent, marginLeft: 6 }}>{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
+                          <Text style={{ fontSize: 7.5, color: accent, marginLeft: 6 }}>{entry.startDate}{entry.current ? ` — ${labels.present}` : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
                         </View>
                         <Text style={{ fontSize: 8, color: '#71717a', marginBottom: 3 }}>{entry.company}</Text>
                         {entry.location && <Text style={{ fontSize: 7.5, color: '#71717a', marginBottom: 2 }}>{entry.location}</Text>}
@@ -101,7 +103,7 @@ export function ExecutivePDF({ cv }: Props) {
                       <View key={entry.id} style={{ marginBottom: i < experience.entries.length - 1 ? 10 : 0 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 }}>
                           <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#1f2937' }}>{entry.title}</Text>
-                          <Text style={{ fontSize: 7.5, color: '#71717a' }}>{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
+                          <Text style={{ fontSize: 7.5, color: '#71717a' }}>{entry.startDate}{entry.current ? ` — ${labels.present}` : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
                         </View>
                         <Text style={{ fontSize: 8, color: '#71717a', marginBottom: 3 }}>{entry.company}</Text>
                         {entry.location && <Text style={{ fontSize: 7.5, color: '#71717a', marginBottom: 2 }}>{entry.location}</Text>}
@@ -118,7 +120,7 @@ export function ExecutivePDF({ cv }: Props) {
           <View style={{ width: 170, flexShrink: 0 }}>
             {skills && (
               <View style={{ marginBottom: 14 }}>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, borderBottomWidth: 1, borderBottomColor: withOpacity(accent, 0.25), paddingBottom: 3, marginBottom: 6 }}>HABILIDADES</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, borderBottomWidth: 1, borderBottomColor: withOpacity(accent, 0.25), paddingBottom: 3, marginBottom: 6 }}>{labels.skills}</Text>
                 {skills.displayMode === 'chips' ? (
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                     {skills.chips.map(chip => (
@@ -141,7 +143,7 @@ export function ExecutivePDF({ cv }: Props) {
             )}
             {education && education.entries.length > 0 && (
               <View style={{ marginBottom: 14 }}>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, borderBottomWidth: 1, borderBottomColor: withOpacity(accent, 0.25), paddingBottom: 3, marginBottom: 6 }}>EDUCACIÓN</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, borderBottomWidth: 1, borderBottomColor: withOpacity(accent, 0.25), paddingBottom: 3, marginBottom: 6 }}>{labels.education}</Text>
                 {education.entries.map(e => (
                   <View key={e.id} style={{ marginBottom: 6 }}>
                     <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#1f2937' }}>{e.degree}</Text>
@@ -153,7 +155,7 @@ export function ExecutivePDF({ cv }: Props) {
             )}
             {languages && languages.entries.length > 0 && (
               <View>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, borderBottomWidth: 1, borderBottomColor: withOpacity(accent, 0.25), paddingBottom: 3, marginBottom: 6 }}>IDIOMAS</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, borderBottomWidth: 1, borderBottomColor: withOpacity(accent, 0.25), paddingBottom: 3, marginBottom: 6 }}>{labels.languages}</Text>
                 {languages.entries.map(l => (
                   <Text key={l.id} style={{ fontSize: 8, color: '#52525b', marginBottom: 2 }}>{l.language} — {l.level}</Text>
                 ))}

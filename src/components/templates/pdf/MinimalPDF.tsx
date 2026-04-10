@@ -1,5 +1,6 @@
 import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
 import { MailIcon, PhoneIcon, MapPinIcon, pdfLinkIcon } from './icons'
+import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { withOpacity } from './color'
 
@@ -13,6 +14,7 @@ export function MinimalPDF({ cv }: Props) {
   const skills = cv.sections.find(s => s.type === 'skills' && s.visible)?.data as SkillsData | undefined
   const education = cv.sections.find(s => s.type === 'education' && s.visible)?.data as EducationData | undefined
   const languages = cv.sections.find(s => s.type === 'languages' && s.visible)?.data as LanguagesData | undefined
+  const labels = getPdfLabels(cv.language)
 
   return (
     <Document>
@@ -66,14 +68,14 @@ export function MinimalPDF({ cv }: Props) {
 
         {about?.summary && (
           <View style={{ marginBottom: 14 }}>
-            <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, marginBottom: 5 }}>PERFIL</Text>
+            <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, marginBottom: 5 }}>{labels.profile}</Text>
             <Text style={{ fontSize: 8.5, color: '#52525b', lineHeight: 1.5 }}>{about.summary}</Text>
           </View>
         )}
 
         {experience && experience.entries.length > 0 && (
           <View style={{ marginBottom: 14 }}>
-            <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, marginBottom: 8 }}>EXPERIENCIA</Text>
+            <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, marginBottom: 8 }}>{labels.experience}</Text>
             {experience.displayMode === 'timeline' ? (
               <View style={{ position: 'relative', paddingLeft: 14 }}>
                 <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, backgroundColor: accent }} />
@@ -83,7 +85,7 @@ export function MinimalPDF({ cv }: Props) {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
                       <Text style={{ fontSize: 9.5, fontFamily: 'Helvetica-Bold', color: '#111111', flex: 1 }}>{entry.title}</Text>
                       <View style={{ backgroundColor: withOpacity(accent, 0.1), paddingHorizontal: 5, paddingVertical: 2, borderRadius: 3, marginLeft: 6 }}>
-                        <Text style={{ fontSize: 7.5, color: accent }}>{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
+                        <Text style={{ fontSize: 7.5, color: accent }}>{entry.startDate}{entry.current ? ` — ${labels.present}` : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
                       </View>
                     </View>
                     <Text style={{ fontSize: 8.5, color: accent, fontFamily: 'Helvetica-Bold', marginBottom: 3 }}>{entry.company}</Text>
@@ -99,7 +101,7 @@ export function MinimalPDF({ cv }: Props) {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 }}>
                       <Text style={{ fontSize: 9.5, fontFamily: 'Helvetica-Bold', color: '#111111' }}>{entry.title}</Text>
                       <Text style={{ fontSize: 8, color: '#71717a' }}>
-                        {entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}
+                        {entry.startDate}{entry.current ? ` — ${labels.present}` : entry.endDate ? ` — ${entry.endDate}` : ''}
                       </Text>
                     </View>
                     <Text style={{ fontSize: 8.5, color: accent, fontFamily: 'Helvetica-Bold', marginBottom: 3 }}>{entry.company}</Text>
@@ -116,7 +118,7 @@ export function MinimalPDF({ cv }: Props) {
         <View style={{ flexDirection: 'row', gap: 20 }}>
           {skills && (
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, marginBottom: 6 }}>HABILIDADES</Text>
+              <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, marginBottom: 6 }}>{labels.skills}</Text>
               {skills.displayMode === 'chips' ? (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                   {skills.chips.map(chip => (
@@ -141,7 +143,7 @@ export function MinimalPDF({ cv }: Props) {
           <View style={{ width: 180, flexShrink: 0 }}>
             {education && education.entries.length > 0 && (
               <View style={{ marginBottom: 12 }}>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, marginBottom: 6 }}>EDUCACIÓN</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, marginBottom: 6 }}>{labels.education}</Text>
                 {education.entries.map(e => (
                   <View key={e.id} style={{ marginBottom: 6 }}>
                     <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#111111' }}>{e.degree}</Text>
@@ -153,7 +155,7 @@ export function MinimalPDF({ cv }: Props) {
             )}
             {languages && languages.entries.length > 0 && (
               <View>
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, marginBottom: 6 }}>IDIOMAS</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, marginBottom: 6 }}>{labels.languages}</Text>
                 {languages.entries.map(l => (
                   <Text key={l.id} style={{ fontSize: 8, color: '#52525b', marginBottom: 2 }}>{l.language} — {l.level}</Text>
                 ))}

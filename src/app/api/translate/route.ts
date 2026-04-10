@@ -11,6 +11,7 @@ export async function POST(request: Request) {
   // Collect all translatable strings preserving order
   const texts: string[] = []
   const translated = structuredClone(cv) as CVDocument
+  translated.language = targetLang
 
   const aboutSection = translated.sections.find(s => s.type === 'about')
   const aboutData = aboutSection?.data as AboutData | undefined
