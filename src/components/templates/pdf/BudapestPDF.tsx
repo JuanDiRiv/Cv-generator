@@ -3,6 +3,7 @@ import { MailIcon, PhoneIcon, MapPinIcon, pdfLinkIcon } from './icons'
 import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { withOpacity } from './color'
+import { normalizePdfParagraph } from './text-utils'
 
 interface Props { cv: CVDocument }
 
@@ -131,7 +132,7 @@ export function BudapestPDF({ cv }: Props) {
               <View style={{ borderLeftWidth: 3, borderLeftColor: accent, paddingLeft: 6, marginBottom: 5 }}>
                 <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: '#1a1a2e' }}>{labels.aboutMe}</Text>
               </View>
-              <Text style={{ fontSize: 8.5, color: '#52525b', lineHeight: 1.5 }}>{about.summary}</Text>
+              <Text style={{ fontSize: 8.5, color: '#52525b', lineHeight: 1.5 }}>{normalizePdfParagraph(about.summary)}</Text>
             </View>
           )}
 

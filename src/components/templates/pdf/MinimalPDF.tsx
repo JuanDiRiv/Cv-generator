@@ -3,6 +3,7 @@ import { MailIcon, PhoneIcon, MapPinIcon, pdfLinkIcon } from './icons'
 import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { withOpacity } from './color'
+import { normalizePdfParagraph } from './text-utils'
 
 interface Props { cv: CVDocument }
 
@@ -69,7 +70,7 @@ export function MinimalPDF({ cv }: Props) {
         {about?.summary && (
           <View style={{ marginBottom: 14 }}>
             <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, marginBottom: 5 }}>{labels.profile}</Text>
-            <Text style={{ fontSize: 8.5, color: '#52525b', lineHeight: 1.5 }}>{about.summary}</Text>
+            <Text style={{ fontSize: 8.5, color: '#52525b', lineHeight: 1.5 }}>{normalizePdfParagraph(about.summary)}</Text>
           </View>
         )}
 
