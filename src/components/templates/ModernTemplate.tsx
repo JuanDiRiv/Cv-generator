@@ -1,4 +1,12 @@
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
+import { Mail, Phone, MapPin, Globe, X, Link as LinkIcon } from 'lucide-react'
+
+function linkIcon(label: string) {
+  const l = label.toLowerCase()
+  if (l.includes('twitter') || l === 'x') return X
+  if (l.includes('portfolio') || l.includes('web') || l.includes('website')) return Globe
+  return LinkIcon
+}
 
 interface Props { cv: CVDocument }
 
@@ -22,9 +30,19 @@ export function ModernTemplate({ cv }: Props) {
             </div>
             <div>
               <p className="text-[8px] font-bold uppercase tracking-widest mb-2 opacity-60 border-b border-white/20 pb-1">Contacto</p>
-              {contact.email && <p className="text-[9px] opacity-80 leading-5">{contact.email}</p>}
-              {contact.phone && <p className="text-[9px] opacity-80 leading-5">{contact.phone}</p>}
-              {contact.location && <p className="text-[9px] opacity-80 leading-5">{contact.location}</p>}
+              {contact.email && <div className="flex items-center gap-1.5 leading-5"><Mail size={8} className="shrink-0 opacity-60" /><span className="text-[9px] opacity-80">{contact.email}</span></div>}
+              {contact.phone && <div className="flex items-center gap-1.5 leading-5"><Phone size={8} className="shrink-0 opacity-60" /><span className="text-[9px] opacity-80">{contact.phone}</span></div>}
+              {contact.location && <div className="flex items-center gap-1.5 leading-5"><MapPin size={8} className="shrink-0 opacity-60" /><span className="text-[9px] opacity-80">{contact.location}</span></div>}
+              {contact.links?.filter(l => l.label && l.url).map((l, i) => {
+                const Icon = linkIcon(l.label)
+                return (
+                  <a key={i} href={l.url} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 leading-5 opacity-80 hover:opacity-100 hover:underline text-white">
+                    <Icon size={8} className="shrink-0" />
+                    <span className="text-[9px]">{l.label}</span>
+                  </a>
+                )
+              })}
             </div>
           </>
         )}
@@ -74,6 +92,7 @@ export function ModernTemplate({ cv }: Props) {
                       <span className="text-[8px] rounded px-1.5 py-0.5 ml-2" style={{ background: accent + '15', color: accent }}>{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</span>
                     </div>
                     <p className="text-[9px] mb-1 font-medium" style={{ color: accent }}>{entry.company}</p>
+                    {entry.location && <p className="text-[8.5px] text-zinc-400 mb-1">{entry.location}</p>}
                     <p className="text-[9px] text-zinc-500 leading-relaxed whitespace-pre-line">{entry.description}</p>
                   </div>
                 ))}
@@ -84,6 +103,7 @@ export function ModernTemplate({ cv }: Props) {
                   <div key={entry.id}>
                     <div className="flex justify-between"><span className="text-[10px] font-bold text-zinc-800">{entry.title}</span><span className="text-[8.5px] text-zinc-400">{entry.startDate}{entry.current ? ' — Actual' : ''}</span></div>
                     <p className="text-[9px] mb-1" style={{ color: accent }}>{entry.company}</p>
+                    {entry.location && <p className="text-[8.5px] text-zinc-400 mb-1">{entry.location}</p>}
                     <p className="text-[9px] text-zinc-500 whitespace-pre-line">{entry.description}</p>
                   </div>
                 ))}

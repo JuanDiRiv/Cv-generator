@@ -6,7 +6,7 @@ export function defaultSections(): CVSection[] {
   return [
     {
       id: nanoid(), type: 'contact', title: 'Información Personal', visible: true,
-      data: { firstName: '', lastName: '', jobTitle: '', email: '', phone: '', location: '' },
+      data: { firstName: '', lastName: '', jobTitle: '', email: '', phone: '', location: '', links: [{ label: 'LinkedIn', url: '' }] },
     },
     {
       id: nanoid(), type: 'about', title: 'Sobre mí', visible: true,

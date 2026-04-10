@@ -3,8 +3,8 @@ import { nanoid } from 'nanoid'
 import { useCVStore } from '@/store/cv-store'
 import type { ExperienceData, ExperienceEntry, ExperienceDisplayMode } from '@/types/cv'
 
-const inputCls = 'w-full rounded bg-zinc-800 border border-zinc-700 px-2 py-1.5 text-xs text-zinc-200 outline-none focus:border-indigo-500'
-const labelCls = 'mb-1 block text-[10px] font-medium uppercase tracking-wider text-zinc-500'
+const inputCls = 'w-full rounded-lg bg-zinc-900 border border-zinc-700 px-3 py-2.5 text-sm text-zinc-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-colors'
+const labelCls = 'mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-zinc-500'
 
 interface Props { sectionId: string }
 
@@ -23,7 +23,10 @@ export function ExperienceForm({ sectionId }: Props) {
   }
 
   const addEntry = () => {
-    const entry: ExperienceEntry = { id: nanoid(), title: '', company: '', startDate: '', endDate: '', current: false, description: '' }
+    const entry: ExperienceEntry = {
+      id: nanoid(), title: '', company: '', location: '',
+      startDate: '', endDate: '', current: false, description: '',
+    }
     updateSection(sectionId, { data: { ...data, entries: [...data.entries, entry] } })
   }
 
@@ -46,7 +49,7 @@ export function ExperienceForm({ sectionId }: Props) {
       </div>
 
       {data.entries.map((entry) => (
-        <div key={entry.id} className="relative rounded-lg border border-zinc-700 bg-zinc-800/50 p-3 flex flex-col gap-2">
+        <div key={entry.id} className="relative rounded-lg border border-zinc-700 bg-zinc-800/50 p-3 flex flex-col gap-3">
           <button onClick={() => removeEntry(entry.id)} className="absolute right-2 top-2 text-zinc-600 hover:text-red-400 text-sm">×</button>
           <div className="flex gap-2">
             <div className="flex-1">
@@ -58,6 +61,10 @@ export function ExperienceForm({ sectionId }: Props) {
               <input className={inputCls} value={entry.company} onChange={e => updateEntry(entry.id, 'company', e.target.value)} />
             </div>
           </div>
+          <div>
+            <label className={labelCls}>Ubicación</label>
+            <input className={inputCls} placeholder="Madrid, España · Remoto" value={entry.location ?? ''} onChange={e => updateEntry(entry.id, 'location', e.target.value)} />
+          </div>
           <div className="flex gap-2 items-end">
             <div className="flex-1">
               <label className={labelCls}>Desde</label>
@@ -67,7 +74,7 @@ export function ExperienceForm({ sectionId }: Props) {
               <label className={labelCls}>Hasta</label>
               <input className={inputCls} placeholder="Actual" value={entry.endDate} disabled={entry.current} onChange={e => updateEntry(entry.id, 'endDate', e.target.value)} />
             </div>
-            <label className="flex items-center gap-1.5 text-[10px] text-zinc-400 mb-1.5 cursor-pointer">
+            <label className="flex items-center gap-1.5 text-[10px] text-zinc-400 mb-3 cursor-pointer">
               <input type="checkbox" checked={entry.current} onChange={e => updateEntry(entry.id, 'current', e.target.checked)} className="accent-indigo-500" />
               Actual
             </label>

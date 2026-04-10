@@ -1,4 +1,12 @@
 import type { CVDocument, ExperienceData, SkillsData, EducationData, LanguagesData, ContactData, AboutData } from '@/types/cv'
+import { Mail, Phone, MapPin, Globe, X, Link as LinkIcon } from 'lucide-react'
+
+function linkIcon(label: string) {
+  const l = label.toLowerCase()
+  if (l.includes('twitter') || l === 'x') return X
+  if (l.includes('portfolio') || l.includes('web') || l.includes('website')) return Globe
+  return LinkIcon
+}
 
 interface Props { cv: CVDocument }
 
@@ -34,10 +42,19 @@ export function BudapestTemplate({ cv }: Props) {
         {contact && (
           <div>
             <p className="mb-2 border-b pb-1 text-[8px] font-bold uppercase tracking-widest" style={{ color: accent, borderColor: '#2a2a4e' }}>Contacto</p>
-            {contact.email && <p className="text-[9px] text-zinc-400 leading-5">{contact.email}</p>}
-            {contact.phone && <p className="text-[9px] text-zinc-400 leading-5">{contact.phone}</p>}
-            {contact.location && <p className="text-[9px] text-zinc-400 leading-5">{contact.location}</p>}
-            {contact.linkedin && <p className="text-[9px] text-zinc-400 leading-5">{contact.linkedin}</p>}
+            {contact.email && <div className="flex items-center gap-1.5 leading-5"><Mail size={8} className="shrink-0 text-zinc-500" /><span className="text-[9px] text-zinc-400">{contact.email}</span></div>}
+            {contact.phone && <div className="flex items-center gap-1.5 leading-5"><Phone size={8} className="shrink-0 text-zinc-500" /><span className="text-[9px] text-zinc-400">{contact.phone}</span></div>}
+            {contact.location && <div className="flex items-center gap-1.5 leading-5"><MapPin size={8} className="shrink-0 text-zinc-500" /><span className="text-[9px] text-zinc-400">{contact.location}</span></div>}
+            {contact.links?.filter(l => l.label && l.url).map((l, i) => {
+              const Icon = linkIcon(l.label)
+              return (
+                <a key={i} href={l.url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 leading-5 hover:underline" style={{ color: accent }}>
+                  <Icon size={8} className="shrink-0" />
+                  <span className="text-[9px]">{l.label}</span>
+                </a>
+              )
+            })}
           </div>
         )}
 
@@ -104,6 +121,7 @@ export function BudapestTemplate({ cv }: Props) {
                       <span className="text-[8px] rounded px-1.5 py-0.5 ml-2 flex-shrink-0" style={{ background: accent + '15', color: accent }}>{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</span>
                     </div>
                     <p className="text-[9px] mb-1" style={{ color: accent }}>{entry.company}</p>
+                    {entry.location && <p className="text-[8.5px] text-zinc-400 mb-1">{entry.location}</p>}
                     <p className="text-[9px] leading-relaxed text-zinc-500 whitespace-pre-line">{entry.description}</p>
                   </div>
                 ))}
@@ -119,6 +137,7 @@ export function BudapestTemplate({ cv }: Props) {
                         <span className="text-[8px] text-zinc-400 ml-2 flex-shrink-0">{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</span>
                       </div>
                       <p className="text-[9px] mb-1" style={{ color: accent }}>{entry.company}</p>
+                      {entry.location && <p className="text-[8.5px] text-zinc-400 mb-1">{entry.location}</p>}
                       <p className="text-[9px] leading-relaxed text-zinc-500 whitespace-pre-line">{entry.description}</p>
                     </div>
                   </div>

@@ -1,4 +1,4 @@
-import { Document, Page, View, Text } from '@react-pdf/renderer'
+import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { withOpacity } from './color'
 
@@ -27,7 +27,12 @@ export function ExecutivePDF({ cv }: Props) {
             <View style={{ alignItems: 'flex-end' }}>
               {contact.email && <Text style={{ fontSize: 7.5, color: '#9ca3af', marginBottom: 2 }}>{contact.email}</Text>}
               {contact.phone && <Text style={{ fontSize: 7.5, color: '#9ca3af', marginBottom: 2 }}>{contact.phone}</Text>}
-              {contact.location && <Text style={{ fontSize: 7.5, color: '#9ca3af' }}>{contact.location}</Text>}
+              {contact.location && <Text style={{ fontSize: 7.5, color: '#9ca3af', marginBottom: 2 }}>{contact.location}</Text>}
+              {contact.links?.filter(l => l.label && l.url).map((l, i) => (
+                <Link key={i} src={l.url} style={{ color: accent, fontSize: 7.5, marginBottom: 3, textDecoration: 'none' }}>
+                  {l.label}
+                </Link>
+              ))}
             </View>
           )}
         </View>
@@ -57,6 +62,7 @@ export function ExecutivePDF({ cv }: Props) {
                           <Text style={{ fontSize: 7.5, color: accent, marginLeft: 6 }}>{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
                         </View>
                         <Text style={{ fontSize: 8, color: '#71717a', marginBottom: 3 }}>{entry.company}</Text>
+                        {entry.location && <Text style={{ fontSize: 7.5, color: '#71717a', marginBottom: 2 }}>{entry.location}</Text>}
                         <Text style={{ fontSize: 8, color: '#71717a', lineHeight: 1.5 }}>{entry.description}</Text>
                       </View>
                     ))}
@@ -70,6 +76,7 @@ export function ExecutivePDF({ cv }: Props) {
                           <Text style={{ fontSize: 7.5, color: '#71717a' }}>{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
                         </View>
                         <Text style={{ fontSize: 8, color: '#71717a', marginBottom: 3 }}>{entry.company}</Text>
+                        {entry.location && <Text style={{ fontSize: 7.5, color: '#71717a', marginBottom: 2 }}>{entry.location}</Text>}
                         <Text style={{ fontSize: 8, color: '#71717a', lineHeight: 1.5 }}>{entry.description}</Text>
                       </View>
                     ))}

@@ -1,4 +1,12 @@
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
+import { Mail, Phone, MapPin, Globe, X, Link as LinkIcon } from 'lucide-react'
+
+function linkIcon(label: string) {
+  const l = label.toLowerCase()
+  if (l.includes('twitter') || l === 'x') return X
+  if (l.includes('portfolio') || l.includes('web') || l.includes('website')) return Globe
+  return LinkIcon
+}
 
 interface Props { cv: CVDocument }
 
@@ -20,10 +28,20 @@ export function ExecutiveTemplate({ cv }: Props) {
           {contact && <p className="text-[10px] font-semibold mt-1 uppercase tracking-widest" style={{ color: accent }}>{contact.jobTitle}</p>}
         </div>
         {contact && (
-          <div className="text-right text-[8.5px] text-zinc-400 leading-5">
-            {contact.email && <p>{contact.email}</p>}
-            {contact.phone && <p>{contact.phone}</p>}
-            {contact.location && <p>{contact.location}</p>}
+          <div className="text-right text-[8.5px] text-zinc-400 leading-5 flex flex-col items-end gap-0.5">
+            {contact.email && <div className="flex items-center gap-1.5"><span>{contact.email}</span><Mail size={8} className="shrink-0 text-zinc-500" /></div>}
+            {contact.phone && <div className="flex items-center gap-1.5"><span>{contact.phone}</span><Phone size={8} className="shrink-0 text-zinc-500" /></div>}
+            {contact.location && <div className="flex items-center gap-1.5"><span>{contact.location}</span><MapPin size={8} className="shrink-0 text-zinc-500" /></div>}
+            {contact.links?.filter(l => l.label && l.url).map((l, i) => {
+              const Icon = linkIcon(l.label)
+              return (
+                <a key={i} href={l.url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 hover:underline" style={{ color: accent }}>
+                  <span>{l.label}</span>
+                  <Icon size={8} className="shrink-0" />
+                </a>
+              )
+            })}
           </div>
         )}
       </div>
@@ -50,6 +68,7 @@ export function ExecutiveTemplate({ cv }: Props) {
                         <span className="text-[8px] ml-2 flex-shrink-0" style={{ color: accent }}>{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</span>
                       </div>
                       <p className="text-[9px] mb-1 text-zinc-500">{entry.company}</p>
+                      {entry.location && <p className="text-[8.5px] text-zinc-400 mb-1">{entry.location}</p>}
                       <p className="text-[9px] text-zinc-500 leading-relaxed whitespace-pre-line">{entry.description}</p>
                     </div>
                   ))}
@@ -60,6 +79,7 @@ export function ExecutiveTemplate({ cv }: Props) {
                     <div key={entry.id}>
                       <div className="flex justify-between"><span className="text-[10px] font-bold text-zinc-800">{entry.title}</span><span className="text-[8.5px] text-zinc-400">{entry.startDate}</span></div>
                       <p className="text-[9px] mb-1 text-zinc-500">{entry.company}</p>
+                      {entry.location && <p className="text-[8.5px] text-zinc-400 mb-1">{entry.location}</p>}
                       <p className="text-[9px] text-zinc-500 whitespace-pre-line">{entry.description}</p>
                     </div>
                   ))}

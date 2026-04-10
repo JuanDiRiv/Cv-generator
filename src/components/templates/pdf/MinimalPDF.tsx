@@ -1,4 +1,4 @@
-import { Document, Page, View, Text } from '@react-pdf/renderer'
+import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { withOpacity } from './color'
 
@@ -27,7 +27,11 @@ export function MinimalPDF({ cv }: Props) {
               {contact.email && <Text style={{ fontSize: 8, color: '#71717a', marginBottom: 2 }}>{contact.email}</Text>}
               {contact.phone && <Text style={{ fontSize: 8, color: '#71717a', marginBottom: 2 }}>{contact.phone}</Text>}
               {contact.location && <Text style={{ fontSize: 8, color: '#71717a', marginBottom: 2 }}>{contact.location}</Text>}
-              {contact.linkedin && <Text style={{ fontSize: 8, color: '#71717a' }}>{contact.linkedin}</Text>}
+              {contact.links?.filter(l => l.label && l.url).map((l, i) => (
+                <Link key={i} src={l.url} style={{ color: accent, fontSize: 7.5, marginBottom: 3, textDecoration: 'none' }}>
+                  {l.label}
+                </Link>
+              ))}
             </View>
           </View>
         )}
@@ -55,6 +59,7 @@ export function MinimalPDF({ cv }: Props) {
                       </View>
                     </View>
                     <Text style={{ fontSize: 8.5, color: accent, fontFamily: 'Helvetica-Bold', marginBottom: 3 }}>{entry.company}</Text>
+                    {entry.location && <Text style={{ fontSize: 7.5, color: '#71717a', marginBottom: 2 }}>{entry.location}</Text>}
                     <Text style={{ fontSize: 8, color: '#52525b', lineHeight: 1.5 }}>{entry.description}</Text>
                   </View>
                 ))}
@@ -70,6 +75,7 @@ export function MinimalPDF({ cv }: Props) {
                       </Text>
                     </View>
                     <Text style={{ fontSize: 8.5, color: accent, fontFamily: 'Helvetica-Bold', marginBottom: 3 }}>{entry.company}</Text>
+                    {entry.location && <Text style={{ fontSize: 7.5, color: '#71717a', marginBottom: 2 }}>{entry.location}</Text>}
                     <Text style={{ fontSize: 8, color: '#52525b', lineHeight: 1.5 }}>{entry.description}</Text>
                   </View>
                 ))}

@@ -1,4 +1,12 @@
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
+import { Mail, Phone, MapPin, Globe, X, Link as LinkIcon } from 'lucide-react'
+
+function linkIcon(label: string) {
+  const l = label.toLowerCase()
+  if (l.includes('twitter') || l === 'x') return X
+  if (l.includes('portfolio') || l.includes('web') || l.includes('website')) return Globe
+  return LinkIcon
+}
 
 interface Props { cv: CVDocument }
 
@@ -19,10 +27,20 @@ export function MinimalTemplate({ cv }: Props) {
             <h1 className="text-[22px] font-bold tracking-tight">{contact.firstName} {contact.lastName}</h1>
             <p className="text-[11px] font-semibold mt-0.5" style={{ color: accent }}>{contact.jobTitle}</p>
           </div>
-          <div className="text-right text-[9px] text-zinc-500 leading-5">
-            {contact.email && <p>{contact.email}</p>}
-            {contact.phone && <p>{contact.phone}</p>}
-            {contact.location && <p>{contact.location}</p>}
+          <div className="text-right text-[9px] text-zinc-500 leading-5 flex flex-col items-end gap-0.5">
+            {contact.email && <div className="flex items-center gap-1.5"><span>{contact.email}</span><Mail size={8} className="shrink-0 text-zinc-400" /></div>}
+            {contact.phone && <div className="flex items-center gap-1.5"><span>{contact.phone}</span><Phone size={8} className="shrink-0 text-zinc-400" /></div>}
+            {contact.location && <div className="flex items-center gap-1.5"><span>{contact.location}</span><MapPin size={8} className="shrink-0 text-zinc-400" /></div>}
+            {contact.links?.filter(l => l.label && l.url).map((l, i) => {
+              const Icon = linkIcon(l.label)
+              return (
+                <a key={i} href={l.url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 hover:underline" style={{ color: accent }}>
+                  <span>{l.label}</span>
+                  <Icon size={8} className="shrink-0" />
+                </a>
+              )
+            })}
           </div>
         </div>
       )}
@@ -45,6 +63,7 @@ export function MinimalTemplate({ cv }: Props) {
                   <span className="text-[8.5px] text-zinc-400">{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</span>
                 </div>
                 <p className="text-[9px] font-medium mb-1" style={{ color: accent }}>{entry.company}</p>
+                {entry.location && <p className="text-[8.5px] text-zinc-400 mb-1">{entry.location}</p>}
                 <p className="text-[9px] text-zinc-500 leading-relaxed whitespace-pre-line">{entry.description}</p>
               </div>
             ))}

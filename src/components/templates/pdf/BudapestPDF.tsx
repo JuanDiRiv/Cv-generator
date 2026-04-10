@@ -1,4 +1,4 @@
-import { Document, Page, View, Text } from '@react-pdf/renderer'
+import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { withOpacity } from './color'
 
@@ -44,7 +44,11 @@ export function BudapestPDF({ cv }: Props) {
               {contact.email && <Text style={{ color: '#9ca3af', fontSize: 7.5, marginBottom: 3 }}>{contact.email}</Text>}
               {contact.phone && <Text style={{ color: '#9ca3af', fontSize: 7.5, marginBottom: 3 }}>{contact.phone}</Text>}
               {contact.location && <Text style={{ color: '#9ca3af', fontSize: 7.5, marginBottom: 3 }}>{contact.location}</Text>}
-              {contact.linkedin && <Text style={{ color: '#9ca3af', fontSize: 7.5 }}>{contact.linkedin}</Text>}
+              {contact.links?.filter(l => l.label && l.url).map((l, i) => (
+                <Link key={i} src={l.url} style={{ color: accent, fontSize: 7.5, marginBottom: 3, textDecoration: 'none' }}>
+                  {l.label}
+                </Link>
+              ))}
             </View>
           )}
 
@@ -130,6 +134,7 @@ export function BudapestPDF({ cv }: Props) {
                         </View>
                       </View>
                       <Text style={{ fontSize: 8, color: accent, fontFamily: 'Helvetica-Bold', marginBottom: 3 }}>{entry.company}</Text>
+                      {entry.location && <Text style={{ fontSize: 7.5, color: '#71717a', marginBottom: 2 }}>{entry.location}</Text>}
                       <Text style={{ fontSize: 8, color: '#71717a', lineHeight: 1.5 }}>{entry.description}</Text>
                     </View>
                   ))}
@@ -148,6 +153,7 @@ export function BudapestPDF({ cv }: Props) {
                           </Text>
                         </View>
                         <Text style={{ fontSize: 8, color: accent, fontFamily: 'Helvetica-Bold', marginBottom: 3 }}>{entry.company}</Text>
+                        {entry.location && <Text style={{ fontSize: 7.5, color: '#71717a', marginBottom: 2 }}>{entry.location}</Text>}
                         <Text style={{ fontSize: 8, color: '#71717a', lineHeight: 1.5 }}>{entry.description}</Text>
                       </View>
                     </View>

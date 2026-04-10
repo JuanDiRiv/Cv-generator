@@ -18,7 +18,7 @@ export function FormPanel() {
   }
 
   return (
-    <div className="flex w-[400px] flex-shrink-0 flex-col border-r border-zinc-800 overflow-hidden">
+    <div className="flex w-120 shrink-0 flex-col border-r border-zinc-800 overflow-hidden">
       <div className="flex items-center justify-between border-b border-zinc-800 px-3 py-2 flex-shrink-0">
         <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Editor</span>
         <div className="flex rounded-md bg-zinc-800 p-0.5 gap-0.5">

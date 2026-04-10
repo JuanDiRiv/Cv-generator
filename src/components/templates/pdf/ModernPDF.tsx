@@ -1,4 +1,4 @@
-import { Document, Page, View, Text } from '@react-pdf/renderer'
+import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { withOpacity } from './color'
 
@@ -31,7 +31,11 @@ export function ModernPDF({ cv }: Props) {
               {contact.email && <Text style={{ fontSize: 7.5, color: 'rgba(255,255,255,0.8)', marginBottom: 3 }}>{contact.email}</Text>}
               {contact.phone && <Text style={{ fontSize: 7.5, color: 'rgba(255,255,255,0.8)', marginBottom: 3 }}>{contact.phone}</Text>}
               {contact.location && <Text style={{ fontSize: 7.5, color: 'rgba(255,255,255,0.8)', marginBottom: 3 }}>{contact.location}</Text>}
-              {contact.linkedin && <Text style={{ fontSize: 7.5, color: 'rgba(255,255,255,0.8)' }}>{contact.linkedin}</Text>}
+              {contact.links?.filter(l => l.label && l.url).map((l, i) => (
+                <Link key={i} src={l.url} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 7.5, marginBottom: 3, textDecoration: 'none' }}>
+                  {l.label}
+                </Link>
+              ))}
             </View>
           )}
           {skills && (
@@ -97,6 +101,7 @@ export function ModernPDF({ cv }: Props) {
                         </View>
                       </View>
                       <Text style={{ fontSize: 8, color: accent, fontFamily: 'Helvetica-Bold', marginBottom: 3 }}>{entry.company}</Text>
+                      {entry.location && <Text style={{ fontSize: 7.5, color: '#71717a', marginBottom: 2 }}>{entry.location}</Text>}
                       <Text style={{ fontSize: 8, color: '#71717a', lineHeight: 1.5 }}>{entry.description}</Text>
                     </View>
                   ))}
@@ -110,6 +115,7 @@ export function ModernPDF({ cv }: Props) {
                         <Text style={{ fontSize: 7.5, color: '#71717a' }}>{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
                       </View>
                       <Text style={{ fontSize: 8, color: accent, fontFamily: 'Helvetica-Bold', marginBottom: 3 }}>{entry.company}</Text>
+                      {entry.location && <Text style={{ fontSize: 7.5, color: '#71717a', marginBottom: 2 }}>{entry.location}</Text>}
                       <Text style={{ fontSize: 8, color: '#71717a', lineHeight: 1.5 }}>{entry.description}</Text>
                     </View>
                   ))}
