@@ -147,7 +147,7 @@ export function CVEditor({ cvId }: Props) {
         <PreviewPanel />
       </div>
 
-      {showExport && <ExportModal cvId={cvId} onClose={() => setShowExport(false)} />}
+      {showExport && <ExportModal onClose={() => setShowExport(false)} />}
     </div>
   )
 }

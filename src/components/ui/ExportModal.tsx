@@ -1,10 +1,11 @@
 'use client'
 import { useState } from 'react'
 import { useCVStore } from '@/store/cv-store'
+import type { CVDocument } from '@/types/cv'
 
-interface Props { cvId: string; onClose: () => void }
+interface Props { onClose: () => void }
 
-export function ExportModal({ cvId: _cvId, onClose }: Props) {
+export function ExportModal({ onClose }: Props) {
   const { cv } = useCVStore()
   const [translating, setTranslating] = useState<'es' | 'en' | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -22,7 +23,7 @@ export function ExportModal({ cvId: _cvId, onClose }: Props) {
         body: JSON.stringify({ cv, targetLang }),
       })
       if (!res.ok) throw new Error('Error en traducción')
-      const dataToExport = await res.json()
+      const dataToExport = (await res.json()) as CVDocument
 
       // 2. Dynamically import to avoid SSR issues
       const [{ pdf }, { pdfTemplates }] = await Promise.all([
