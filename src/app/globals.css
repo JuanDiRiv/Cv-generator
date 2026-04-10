@@ -24,3 +24,17 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+:root {
+  --accent: #6366f1;
+}
+
+@media print {
+  body > *:not(#cv-print-root) { display: none !important; }
+  #cv-print-root { display: block !important; }
+  @page { margin: 0; size: A4; }
+}
+
+#cv-print-root {
+  display: none;
+}
