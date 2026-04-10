@@ -143,13 +143,13 @@ export function BudapestPDF({ cv }: Props) {
 
               {experience.displayMode === 'timeline' ? (
                 /* Timeline mode */
-                <View style={{ position: 'relative', paddingLeft: 14 }}>
-                  <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, backgroundColor: accent }} />
+                <View style={{ position: 'relative', paddingLeft: 16 }}>
+                  <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, backgroundColor: withOpacity(accent, 96 / 255) }} />
                   {experience.entries.map((entry, i) => (
-                    <View key={entry.id} style={{ marginBottom: i < experience.entries.length - 1 ? 10 : 0, position: 'relative' }}>
+                    <View key={entry.id} style={{ marginBottom: i < experience.entries.length - 1 ? 10 : 0, position: 'relative', paddingLeft: 16 }}>
                       {/* Dot */}
                       <View style={{
-                        position: 'absolute', left: -19, top: 2,
+                        position: 'absolute', left: -21, top: 4,
                         width: 10, height: 10, borderRadius: 5,
                         backgroundColor: i === 0 ? accent : '#ffffff',
                         borderWidth: 2, borderColor: accent,

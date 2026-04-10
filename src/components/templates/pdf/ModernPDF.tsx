@@ -119,11 +119,11 @@ export function ModernPDF({ cv }: Props) {
               </View>
 
               {experience.displayMode === 'timeline' ? (
-                <View style={{ position: 'relative', paddingLeft: 14 }}>
-                  <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, backgroundColor: accent }} />
+                <View style={{ position: 'relative', paddingLeft: 16 }}>
+                  <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, backgroundColor: withOpacity(accent, 80 / 255) }} />
                   {experience.entries.map((entry, i) => (
-                    <View key={entry.id} style={{ marginBottom: i < experience.entries.length - 1 ? 10 : 0, position: 'relative' }}>
-                      <View style={{ position: 'absolute', left: -19, top: 2, width: 10, height: 10, borderRadius: 5, backgroundColor: i === 0 ? accent : '#ffffff', borderWidth: 2, borderColor: accent }} />
+                    <View key={entry.id} style={{ marginBottom: i < experience.entries.length - 1 ? 10 : 0, position: 'relative', paddingLeft: 12 }}>
+                      <View style={{ position: 'absolute', left: -21, top: 4, width: 10, height: 10, borderRadius: 5, backgroundColor: i === 0 ? accent : '#ffffff', borderWidth: 2, borderColor: accent }} />
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
                         <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#1f2937', flex: 1 }}>{entry.title}</Text>
                         <View style={{ backgroundColor: withOpacity(accent, 0.12), paddingHorizontal: 5, paddingVertical: 2, borderRadius: 3, marginLeft: 6 }}>

@@ -83,10 +83,10 @@ export function ExecutivePDF({ cv }: Props) {
                 <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: accent, borderBottomWidth: 1, borderBottomColor: withOpacity(accent, 0.25), paddingBottom: 3, marginBottom: 8 }}>{labels.experience}</Text>
                 {experience.displayMode === 'timeline' ? (
                   <View style={{ position: 'relative', paddingLeft: 12 }}>
-                    <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 1, backgroundColor: accent }} />
+                    <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 1, backgroundColor: withOpacity(accent, 64 / 255) }} />
                     {experience.entries.map((entry, i) => (
-                      <View key={entry.id} style={{ marginBottom: i < experience.entries.length - 1 ? 10 : 0, position: 'relative' }}>
-                        <View style={{ position: 'absolute', left: -16, top: 2, width: 8, height: 8, borderRadius: 4, backgroundColor: i === 0 ? accent : '#ffffff', borderWidth: 1, borderColor: accent }} />
+                      <View key={entry.id} style={{ marginBottom: i < experience.entries.length - 1 ? 10 : 0, position: 'relative', paddingLeft: 12 }}>
+                        <View style={{ position: 'absolute', left: -17, top: 4, width: 8, height: 8, borderRadius: 4, backgroundColor: i === 0 ? accent : '#ffffff', borderWidth: 1, borderColor: accent }} />
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
                           <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#1f2937', flex: 1 }}>{entry.title}</Text>
                           <Text style={{ fontSize: 7.5, color: accent, marginLeft: 6 }}>{entry.startDate}{entry.current ? ` — ${labels.present}` : entry.endDate ? ` — ${entry.endDate}` : ''}</Text>
