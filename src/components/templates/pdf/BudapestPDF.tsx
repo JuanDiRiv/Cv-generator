@@ -1,12 +1,8 @@
 import { Document, Page, View, Text } from '@react-pdf/renderer'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
+import { withOpacity } from './color'
 
 interface Props { cv: CVDocument }
-
-function hex(color: string, alpha: number) {
-  // Append 2-digit hex alpha to a hex color string
-  return color + Math.round(alpha * 255).toString(16).padStart(2, '0')
-}
 
 export function BudapestPDF({ cv }: Props) {
   const accent = cv.accentColor || '#6366f1'
@@ -113,7 +109,8 @@ export function BudapestPDF({ cv }: Props) {
 
               {experience.displayMode === 'timeline' ? (
                 /* Timeline mode */
-                <View style={{ borderLeftWidth: 2, borderLeftColor: hex(accent, 0.38), paddingLeft: 14 }}>
+                <View style={{ position: 'relative', paddingLeft: 14 }}>
+                  <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, backgroundColor: accent }} />
                   {experience.entries.map((entry, i) => (
                     <View key={entry.id} style={{ marginBottom: i < experience.entries.length - 1 ? 10 : 0, position: 'relative' }}>
                       {/* Dot */}
@@ -126,7 +123,7 @@ export function BudapestPDF({ cv }: Props) {
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
                         <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#1a1a2e', flex: 1 }}>{entry.title}</Text>
                         {/* Date badge */}
-                        <View style={{ backgroundColor: hex(accent, 0.12), paddingHorizontal: 5, paddingVertical: 2, borderRadius: 3, marginLeft: 6 }}>
+                        <View style={{ backgroundColor: withOpacity(accent, 0.12), paddingHorizontal: 5, paddingVertical: 2, borderRadius: 3, marginLeft: 6 }}>
                           <Text style={{ fontSize: 7, color: accent }}>
                             {entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}
                           </Text>
