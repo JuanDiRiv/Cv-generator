@@ -1,5 +1,7 @@
-import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
+import type { ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { Mail, Phone, MapPin, Globe, X, Link as LinkIcon } from 'lucide-react'
+import { DiffText, getBaselineTextMaps } from './highlight'
+import type { TemplateProps } from './index'
 
 function linkIcon(label: string) {
   const l = label.toLowerCase()
@@ -8,9 +10,7 @@ function linkIcon(label: string) {
   return LinkIcon
 }
 
-interface Props { cv: CVDocument }
-
-export function MinimalTemplate({ cv }: Props) {
+export function MinimalTemplate({ cv, baselineCV, highlightChanges = false }: TemplateProps) {
   const accent = cv.accentColor || '#6366f1'
   const contact = cv.sections.find(s => s.type === 'contact' && s.visible)?.data as ContactData | undefined
   const about = cv.sections.find(s => s.type === 'about' && s.visible)?.data as AboutData | undefined
@@ -18,6 +18,11 @@ export function MinimalTemplate({ cv }: Props) {
   const skills = cv.sections.find(s => s.type === 'skills' && s.visible)?.data as SkillsData | undefined
   const education = cv.sections.find(s => s.type === 'education' && s.visible)?.data as EducationData | undefined
   const languages = cv.sections.find(s => s.type === 'languages' && s.visible)?.data as LanguagesData | undefined
+  const baseline = getBaselineTextMaps(baselineCV)
+  const baselineChipSet = new Set(baseline.skillsChipLabels.map((label) => label.toLowerCase()))
+  const removedChips = baseline.skillsChipLabels.filter(
+    (label) => !skills?.chips.some((chip) => chip.label.toLowerCase() === label.toLowerCase()),
+  )
 
   return (
     <div className="font-sans" style={{ width: '210mm', minHeight: '297mm', background: '#fff', padding: '14mm 16mm', color: '#111' }}>
@@ -48,7 +53,14 @@ export function MinimalTemplate({ cv }: Props) {
       {about?.summary && (
         <div className="mb-5">
           <h2 className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: accent }}>Perfil</h2>
-          <p className="text-[9.5px] leading-relaxed text-zinc-600">{about.summary}</p>
+          <p className="text-[9.5px] leading-relaxed text-zinc-600">
+            <DiffText
+              previousText={baseline.aboutSummary}
+              nextText={about.summary}
+              enabled={highlightChanges}
+              preserveLines
+            />
+          </p>
         </div>
       )}
 
@@ -64,7 +76,14 @@ export function MinimalTemplate({ cv }: Props) {
                 </div>
                 <p className="text-[9px] font-medium mb-1" style={{ color: accent }}>{entry.company}</p>
                 {entry.location && <p className="text-[8.5px] text-zinc-400 mb-1">{entry.location}</p>}
-                <p className="text-[9px] text-zinc-500 leading-relaxed whitespace-pre-line">{entry.description}</p>
+                <p className="text-[9px] text-zinc-500 leading-relaxed whitespace-pre-line">
+                  <DiffText
+                    previousText={baseline.experienceById.get(entry.id) ?? ''}
+                    nextText={entry.description}
+                    enabled={highlightChanges}
+                    preserveLines
+                  />
+                </p>
               </div>
             ))}
           </div>
@@ -77,14 +96,35 @@ export function MinimalTemplate({ cv }: Props) {
             <h2 className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: accent }}>Habilidades</h2>
             {skills.displayMode === 'chips' ? (
               <div className="flex flex-wrap gap-1">
-                {skills.chips.map(c => <span key={c.id} className="rounded px-1.5 py-0.5 text-[8px] border border-zinc-200 text-zinc-600">{c.label}</span>)}
+                {skills.chips.map((c) => {
+                  const isAdded = highlightChanges && !baselineChipSet.has(c.label.toLowerCase())
+                  return (
+                    <span
+                      key={c.id}
+                      className={`rounded px-1.5 py-0.5 text-[8px] border ${isAdded ? 'border-emerald-400 bg-emerald-500/20 text-emerald-700' : 'border-zinc-200 text-zinc-600'}`}
+                    >
+                      {c.label}
+                    </span>
+                  )
+                })}
+                {highlightChanges && removedChips.map((label) => (
+                  <span key={`removed-${label}`} className="rounded px-1.5 py-0.5 text-[8px] border border-red-300 bg-red-500/15 text-red-700 line-through">
+                    {label}
+                  </span>
+                ))}
               </div>
             ) : (
               <div className="flex flex-col gap-2">
                 {skills.categories.map(cat => (
                   <div key={cat.id}>
                     <p className="text-[8.5px] font-bold uppercase tracking-wider" style={{ color: accent }}>{cat.name}</p>
-                    <p className="text-[8.5px] text-zinc-500">{cat.skills.join(' | ')}</p>
+                    <p className="text-[8.5px] text-zinc-500">
+                      <DiffText
+                        previousText={baseline.skillsByCategoryName.get(cat.name.toLowerCase()) ?? ''}
+                        nextText={cat.skills.join(' | ')}
+                        enabled={highlightChanges}
+                      />
+                    </p>
                   </div>
                 ))}
               </div>

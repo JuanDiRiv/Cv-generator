@@ -13,6 +13,7 @@ export function PreviewPanel() {
   const { cv, aiSuggestionCV, activePreviewTab, updateField } = useCVStore()
   const containerRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(0.9)
+  const [showHighlights, setShowHighlights] = useState(true)
 
   useLayoutEffect(() => {
     const el = containerRef.current
@@ -55,7 +56,16 @@ export function PreviewPanel() {
         </div>
         <div className="ml-auto flex items-center gap-1.5">
           {usingAISuggestion && (
-            <span className="mr-2 text-[11px] font-semibold text-indigo-300">AI suggestions preview</span>
+            <>
+              <span className="text-[11px] font-semibold text-indigo-300">AI suggestions preview</span>
+              <button
+                type="button"
+                onClick={() => setShowHighlights((value) => !value)}
+                className="rounded-md border border-zinc-700 px-2 py-1 text-[11px] font-semibold text-zinc-300 hover:border-zinc-500"
+              >
+                {showHighlights ? 'Ocultar highlights' : 'Mostrar highlights'}
+              </button>
+            </>
           )}
           {ACCENT_COLORS.map((color) => (
             <button
@@ -81,7 +91,11 @@ export function PreviewPanel() {
             marginBottom: `calc((${scale} - 1) * 100%)`,
           }}
         >
-          <Template cv={previewCV} />
+          <Template
+            cv={previewCV}
+            baselineCV={usingAISuggestion ? cv : undefined}
+            highlightChanges={usingAISuggestion && showHighlights}
+          />
         </div>
       </div>
     </div>

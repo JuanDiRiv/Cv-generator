@@ -1,5 +1,7 @@
-import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
+import type { ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { Mail, Phone, MapPin, Globe, X, Link as LinkIcon } from 'lucide-react'
+import { DiffText, getBaselineTextMaps } from './highlight'
+import type { TemplateProps } from './index'
 
 function linkIcon(label: string) {
   const l = label.toLowerCase()
@@ -8,9 +10,7 @@ function linkIcon(label: string) {
   return LinkIcon
 }
 
-interface Props { cv: CVDocument }
-
-export function ModernTemplate({ cv }: Props) {
+export function ModernTemplate({ cv, baselineCV, highlightChanges = false }: TemplateProps) {
   const accent = cv.accentColor || '#2d6a4f'
   const contact = cv.sections.find(s => s.type === 'contact' && s.visible)?.data as ContactData | undefined
   const about = cv.sections.find(s => s.type === 'about' && s.visible)?.data as AboutData | undefined
@@ -18,10 +18,15 @@ export function ModernTemplate({ cv }: Props) {
   const skills = cv.sections.find(s => s.type === 'skills' && s.visible)?.data as SkillsData | undefined
   const education = cv.sections.find(s => s.type === 'education' && s.visible)?.data as EducationData | undefined
   const languages = cv.sections.find(s => s.type === 'languages' && s.visible)?.data as LanguagesData | undefined
+  const baseline = getBaselineTextMaps(baselineCV)
+  const baselineChipSet = new Set(baseline.skillsChipLabels.map((label) => label.toLowerCase()))
+  const removedChips = baseline.skillsChipLabels.filter(
+    (label) => !skills?.chips.some((chip) => chip.label.toLowerCase() === label.toLowerCase()),
+  )
 
   return (
     <div className="flex font-sans" style={{ width: '210mm', minHeight: '297mm', background: '#fff' }}>
-      <div className="w-[78mm] flex-shrink-0 p-6 flex flex-col gap-5" style={{ background: accent, color: 'rgba(255,255,255,0.9)' }}>
+      <div className="w-[78mm] shrink-0 p-6 flex flex-col gap-5" style={{ background: accent, color: 'rgba(255,255,255,0.9)' }}>
         {contact && (
           <>
             <div>
@@ -51,14 +56,35 @@ export function ModernTemplate({ cv }: Props) {
             <p className="text-[8px] font-bold uppercase tracking-widest mb-2 opacity-60 border-b border-white/20 pb-1">Habilidades</p>
             {skills.displayMode === 'chips' ? (
               <div className="flex flex-wrap gap-1">
-                {skills.chips.map(c => <span key={c.id} className="rounded px-1.5 py-0.5 text-[8px] bg-white/20 text-white">{c.label}</span>)}
+                {skills.chips.map((c) => {
+                  const isAdded = highlightChanges && !baselineChipSet.has(c.label.toLowerCase())
+                  return (
+                    <span
+                      key={c.id}
+                      className={`rounded px-1.5 py-0.5 text-[8px] ${isAdded ? 'bg-emerald-400/35 text-white' : 'bg-white/20 text-white'}`}
+                    >
+                      {c.label}
+                    </span>
+                  )
+                })}
+                {highlightChanges && removedChips.map((label) => (
+                  <span key={`removed-${label}`} className="rounded px-1.5 py-0.5 text-[8px] bg-red-400/35 text-white line-through">
+                    {label}
+                  </span>
+                ))}
               </div>
             ) : (
               <div className="flex flex-col gap-2">
                 {skills.categories.map(cat => (
                   <div key={cat.id}>
                     <p className="text-[8px] font-bold uppercase tracking-wider text-white/60">{cat.name}</p>
-                    <p className="text-[8.5px] text-white/80 leading-relaxed">{cat.skills.join(' | ')}</p>
+                    <p className="text-[8.5px] text-white/80 leading-relaxed">
+                      <DiffText
+                        previousText={baseline.skillsByCategoryName.get(cat.name.toLowerCase()) ?? ''}
+                        nextText={cat.skills.join(' | ')}
+                        enabled={highlightChanges}
+                      />
+                    </p>
                   </div>
                 ))}
               </div>
@@ -76,7 +102,14 @@ export function ModernTemplate({ cv }: Props) {
         {about?.summary && (
           <div>
             <h2 className="border-l-[3px] pl-2 text-[10px] font-bold uppercase tracking-wider mb-2" style={{ borderColor: accent, color: accent }}>Sobre mí</h2>
-            <p className="text-[9.5px] leading-relaxed text-zinc-600">{about.summary}</p>
+            <p className="text-[9.5px] leading-relaxed text-zinc-600">
+              <DiffText
+                previousText={baseline.aboutSummary}
+                nextText={about.summary}
+                enabled={highlightChanges}
+                preserveLines
+              />
+            </p>
           </div>
         )}
         {experience && experience.entries.length > 0 && (
@@ -86,14 +119,21 @@ export function ModernTemplate({ cv }: Props) {
               <div className="relative pl-4 border-l-2" style={{ borderColor: accent + '50' }}>
                 {experience.entries.map((entry, i) => (
                   <div key={entry.id} className="relative mb-4 pl-3 last:mb-0">
-                    <div className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full border-2" style={{ background: i === 0 ? accent : '#fff', borderColor: accent }} />
+                    <div className="absolute -left-5.25 top-1 h-2.5 w-2.5 rounded-full border-2" style={{ background: i === 0 ? accent : '#fff', borderColor: accent }} />
                     <div className="flex items-baseline justify-between">
                       <span className="text-[10px] font-bold text-zinc-800">{entry.title}</span>
                       <span className="text-[8px] rounded px-1.5 py-0.5 ml-2" style={{ background: accent + '15', color: accent }}>{entry.startDate}{entry.current ? ' — Actual' : entry.endDate ? ` — ${entry.endDate}` : ''}</span>
                     </div>
                     <p className="text-[9px] mb-1 font-medium" style={{ color: accent }}>{entry.company}</p>
                     {entry.location && <p className="text-[8.5px] text-zinc-400 mb-1">{entry.location}</p>}
-                    <p className="text-[9px] text-zinc-500 leading-relaxed whitespace-pre-line">{entry.description}</p>
+                    <p className="text-[9px] text-zinc-500 leading-relaxed whitespace-pre-line">
+                      <DiffText
+                        previousText={baseline.experienceById.get(entry.id) ?? ''}
+                        nextText={entry.description}
+                        enabled={highlightChanges}
+                        preserveLines
+                      />
+                    </p>
                   </div>
                 ))}
               </div>
@@ -104,7 +144,14 @@ export function ModernTemplate({ cv }: Props) {
                     <div className="flex justify-between"><span className="text-[10px] font-bold text-zinc-800">{entry.title}</span><span className="text-[8.5px] text-zinc-400">{entry.startDate}{entry.current ? ' — Actual' : ''}</span></div>
                     <p className="text-[9px] mb-1" style={{ color: accent }}>{entry.company}</p>
                     {entry.location && <p className="text-[8.5px] text-zinc-400 mb-1">{entry.location}</p>}
-                    <p className="text-[9px] text-zinc-500 whitespace-pre-line">{entry.description}</p>
+                    <p className="text-[9px] text-zinc-500 whitespace-pre-line">
+                      <DiffText
+                        previousText={baseline.experienceById.get(entry.id) ?? ''}
+                        nextText={entry.description}
+                        enabled={highlightChanges}
+                        preserveLines
+                      />
+                    </p>
                   </div>
                 ))}
               </div>
