@@ -48,8 +48,8 @@ export function PreviewPanel() {
               disabled={usingAISuggestion}
               onClick={() => updateField('template', id)}
               className={`rounded px-2.5 py-1 text-xs capitalize transition-colors border ${previewCV.template === id
-                  ? 'bg-indigo-600 border-indigo-600 text-white'
-                  : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
+                ? 'bg-indigo-600 border-indigo-600 text-white'
+                : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
                 }`}
             >{id}</button>
           ))}

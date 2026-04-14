@@ -26,7 +26,10 @@ function mergeSegments(segments: DiffSegment[]): DiffSegment[] {
   return merged;
 }
 
-export function diffByWords(previousText: string, nextText: string): DiffSegment[] {
+export function diffByWords(
+  previousText: string,
+  nextText: string,
+): DiffSegment[] {
   const oldTokens = tokenize(previousText);
   const newTokens = tokenize(nextText);
 
