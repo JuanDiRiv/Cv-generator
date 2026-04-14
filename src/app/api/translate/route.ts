@@ -27,14 +27,14 @@ export async function POST(request: Request) {
   const expSection = translated.sections.find((s) => s.type === "experience");
   const expData = expSection?.data as ExperienceData | undefined;
   expData?.entries.forEach((e) => {
-    if (e.title) texts.push(e.title);
+    // Keep role/company/location as authored. Only translate narrative description.
     if (e.description) texts.push(e.description);
   });
 
   const eduSection = translated.sections.find((s) => s.type === "education");
   const eduData = eduSection?.data as EducationData | undefined;
   eduData?.entries.forEach((e) => {
-    if (e.degree) texts.push(e.degree);
+    // Keep degree titles as authored; only translate optional description.
     if (e.description) texts.push(e.description);
   });
 
@@ -50,11 +50,6 @@ export async function POST(request: Request) {
     ).summary = results[i++];
   }
   expData?.entries.forEach((_, idx) => {
-    if (expData.entries[idx].title)
-      (
-        translated.sections.find((s) => s.type === "experience")!
-          .data as ExperienceData
-      ).entries[idx].title = results[i++];
     if (expData.entries[idx].description)
       (
         translated.sections.find((s) => s.type === "experience")!
@@ -62,11 +57,6 @@ export async function POST(request: Request) {
       ).entries[idx].description = results[i++];
   });
   eduData?.entries.forEach((_, idx) => {
-    if (eduData.entries[idx].degree)
-      (
-        translated.sections.find((s) => s.type === "education")!
-          .data as EducationData
-      ).entries[idx].degree = results[i++];
     if (eduData.entries[idx].description)
       (
         translated.sections.find((s) => s.type === "education")!
