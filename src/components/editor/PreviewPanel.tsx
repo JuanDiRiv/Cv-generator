@@ -10,7 +10,7 @@ const ACCENT_COLORS = ['#6366f1', '#e94560', '#2d6a4f', '#c9a96e', '#0ea5e9']
 const TEMPLATE_IDS: TemplateId[] = ['budapest', 'minimal', 'modern', 'executive']
 
 export function PreviewPanel() {
-  const { cv, updateField } = useCVStore()
+  const { cv, aiSuggestionCV, activePreviewTab, updateField } = useCVStore()
   const containerRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(0.9)
 
@@ -29,34 +29,41 @@ export function PreviewPanel() {
 
   if (!cv) return null
 
-  const Template = templates[cv.template]
+  const usingAISuggestion = activePreviewTab === 'ai' && !!aiSuggestionCV
+  const previewCV = usingAISuggestion ? aiSuggestionCV : cv
+  if (!previewCV) return null
+
+  const Template = templates[previewCV.template]
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Toolbar */}
-      <div className="flex flex-shrink-0 items-center gap-3 border-b border-zinc-800 px-4 py-2">
+      <div className="flex shrink-0 items-center gap-3 border-b border-zinc-800 px-4 py-2">
         <span className="text-xs text-zinc-500">Plantilla</span>
         <div className="flex gap-1">
           {TEMPLATE_IDS.map((id) => (
             <button
               key={id}
+              disabled={usingAISuggestion}
               onClick={() => updateField('template', id)}
-              className={`rounded px-2.5 py-1 text-xs capitalize transition-colors border ${
-                cv.template === id
+              className={`rounded px-2.5 py-1 text-xs capitalize transition-colors border ${previewCV.template === id
                   ? 'bg-indigo-600 border-indigo-600 text-white'
                   : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-              }`}
+                }`}
             >{id}</button>
           ))}
         </div>
         <div className="ml-auto flex items-center gap-1.5">
+          {usingAISuggestion && (
+            <span className="mr-2 text-[11px] font-semibold text-indigo-300">AI suggestions preview</span>
+          )}
           {ACCENT_COLORS.map((color) => (
             <button
               key={color}
+              disabled={usingAISuggestion}
               onClick={() => updateField('accentColor', color)}
-              className={`h-5 w-5 rounded-full border-2 transition-transform ${
-                cv.accentColor === color ? 'border-white scale-110' : 'border-transparent'
-              }`}
+              className={`h-5 w-5 rounded-full border-2 transition-transform ${previewCV.accentColor === color ? 'border-white scale-110' : 'border-transparent'
+                }`}
               style={{ background: color }}
             />
           ))}
@@ -74,7 +81,7 @@ export function PreviewPanel() {
             marginBottom: `calc((${scale} - 1) * 100%)`,
           }}
         >
-          <Template cv={cv} />
+          <Template cv={previewCV} />
         </div>
       </div>
     </div>

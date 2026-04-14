@@ -1,17 +1,18 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { SectionList } from './SectionList'
+import { AIToolsPanel } from './AIToolsPanel'
 
 type ViewMode = 'scroll' | 'tabs'
 
 export function FormPanel() {
-  const [viewMode, setViewMode] = useState<ViewMode>('scroll')
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    if (typeof window === 'undefined') return 'scroll'
+    const stored = localStorage.getItem('cv-form-viewmode')
+    return stored === 'tabs' ? 'tabs' : 'scroll'
+  })
   const [profileOpen, setProfileOpen] = useState(true)
-
-  useEffect(() => {
-    const stored = localStorage.getItem('cv-form-viewmode') as ViewMode | null
-    if (stored) setViewMode(stored)
-  }, [])
+  const [aiToolsOpen, setAiToolsOpen] = useState(false)
 
   const setMode = (mode: ViewMode) => {
     setViewMode(mode)
@@ -36,20 +37,38 @@ export function FormPanel() {
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-3">
-        <div className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900">
-          <button
-            type="button"
-            onClick={() => setProfileOpen((open) => !open)}
-            className="flex w-full items-center justify-between px-3 py-2.5 text-left"
-          >
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">Profile</span>
-            <span className={`text-zinc-500 text-sm transition-transform ${profileOpen ? 'rotate-180' : ''}`}>⌄</span>
-          </button>
-          {profileOpen && (
-            <div className="border-t border-zinc-800 p-2.5">
-              <SectionList />
-            </div>
-          )}
+        <div className="flex flex-col gap-3">
+          <div className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900">
+            <button
+              type="button"
+              onClick={() => setProfileOpen((open) => !open)}
+              className="flex w-full items-center justify-between px-3 py-2.5 text-left"
+            >
+              <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">Profile</span>
+              <span className={`text-zinc-500 text-sm transition-transform ${profileOpen ? 'rotate-180' : ''}`}>⌄</span>
+            </button>
+            {profileOpen && (
+              <div className="border-t border-zinc-800 p-2.5">
+                <SectionList />
+              </div>
+            )}
+          </div>
+
+          <div className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900">
+            <button
+              type="button"
+              onClick={() => setAiToolsOpen((open) => !open)}
+              className="flex w-full items-center justify-between px-3 py-2.5 text-left"
+            >
+              <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">AI Tools</span>
+              <span className={`text-zinc-500 text-sm transition-transform ${aiToolsOpen ? 'rotate-180' : ''}`}>⌄</span>
+            </button>
+            {aiToolsOpen && (
+              <div className="border-t border-zinc-800 p-2.5">
+                <AIToolsPanel />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
