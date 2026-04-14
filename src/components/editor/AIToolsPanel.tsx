@@ -15,6 +15,7 @@ interface AIAnalyzeResponse {
 export function AIToolsPanel() {
   const { cv, aiAnalysis, setAISuggestion, setActivePreviewTab } = useCVStore()
   const [jobOffer, setJobOffer] = useState('')
+  const [jobMatchOpen, setJobMatchOpen] = useState(false)
   const [runningMode, setRunningMode] = useState<AnalysisMode | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -68,22 +69,33 @@ export function AIToolsPanel() {
         Las sugerencias de IA no editan tu CV original. Se abren en una tab separada.
       </p>
 
-      <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3">
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Job Match</p>
-        <textarea
-          value={jobOffer}
-          onChange={(e) => setJobOffer(e.target.value)}
-          placeholder="Pega aqui la oferta laboral para medir que tan apto es tu perfil..."
-          className="min-h-28 w-full resize-y rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 outline-none focus:border-indigo-500"
-        />
+      <div className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950">
         <button
           type="button"
-          onClick={() => runAnalysis('job-match')}
-          disabled={runningMode !== null}
-          className="mt-2 w-full rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
+          onClick={() => setJobMatchOpen((open) => !open)}
+          className="flex w-full items-center justify-between px-3 py-2.5 text-left"
         >
-          {runningMode === 'job-match' ? 'Analizando oferta...' : 'Analizar fit con oferta'}
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Job Match</span>
+          <span className={`text-zinc-500 text-sm transition-transform ${jobMatchOpen ? 'rotate-180' : ''}`}>⌄</span>
         </button>
+        {jobMatchOpen && (
+          <div className="border-t border-zinc-800 p-3">
+            <textarea
+              value={jobOffer}
+              onChange={(e) => setJobOffer(e.target.value)}
+              placeholder="Pega aqui la oferta laboral para medir que tan apto es tu perfil..."
+              className="min-h-28 w-full resize-y rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 outline-none focus:border-indigo-500"
+            />
+            <button
+              type="button"
+              onClick={() => runAnalysis('job-match')}
+              disabled={runningMode !== null}
+              className="mt-2 w-full rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
+            >
+              {runningMode === 'job-match' ? 'Analizando oferta...' : 'Analizar fit con oferta'}
+            </button>
+          </div>
+        )}
       </div>
 
       <button
