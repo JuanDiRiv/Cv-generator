@@ -2,13 +2,13 @@ import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
 import { MailIcon, PhoneIcon, MapPinIcon, pdfLinkIcon } from './icons'
 import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
-import { withOpacity } from './color'
+import { resolvePdfAccent, withOpacity } from './color'
 import { normalizePdfParagraph } from './text-utils'
 
 interface Props { cv: CVDocument }
 
 export function ExecutivePDF({ cv }: Props) {
-  const accent = cv.accentColor || '#c9a96e'
+  const accent = resolvePdfAccent(cv.accentColor)
   const contact = cv.sections.find(s => s.type === 'contact' && s.visible)?.data as ContactData | undefined
   const about = cv.sections.find(s => s.type === 'about' && s.visible)?.data as AboutData | undefined
   const experience = cv.sections.find(s => s.type === 'experience' && s.visible)?.data as ExperienceData | undefined
