@@ -48,15 +48,13 @@ body {
   display: none;
 }
 
-:where(
-    button,
-    a[href],
-    summary,
-    input[type="button"],
-    input[type="submit"],
-    input[type="reset"],
-    [role="button"]
-  ):not(:disabled):not([aria-disabled="true"]) {
+:where(button,
+  a[href],
+  summary,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  [role="button"]):not(:disabled):not([aria-disabled="true"]) {
   cursor: pointer !important;
 }
 
