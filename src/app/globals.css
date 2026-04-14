@@ -48,19 +48,19 @@ body {
   display: none;
 }
 
-button:not(:disabled),
-a[href],
-summary,
-input[type="button"],
-input[type="submit"],
-input[type="reset"],
-[role="button"] {
-  cursor: pointer;
+:where(
+    button,
+    a[href],
+    summary,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    [role="button"]
+  ):not(:disabled):not([aria-disabled="true"]) {
+  cursor: pointer !important;
 }
 
-button:disabled,
-input:disabled,
-select:disabled,
-textarea:disabled {
-  cursor: not-allowed;
+:where(button, input, select, textarea):disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed !important;
 }
