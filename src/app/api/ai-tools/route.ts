@@ -181,12 +181,23 @@ function applyAIChanges(cv: CVDocument, changes: AIChanges): CVDocument {
       changes.skillsCategories &&
       changes.skillsCategories.length > 0
     ) {
-      const nextCategories = changes.skillsCategories.map((category, idx) => ({
-        id: skillsData.categories[idx]?.id ?? `ai-category-${idx + 1}`,
-        name: category.name,
-        skills: category.skills,
-      }));
-      skillsData.categories = nextCategories;
+      if (skillsData.categories.length > 0) {
+        // Preserve category names (titles) exactly as authored.
+        skillsData.categories = skillsData.categories.map((category, idx) => {
+          const incoming = changes.skillsCategories?.[idx];
+          if (!incoming || incoming.skills.length === 0) return category;
+          return { ...category, skills: incoming.skills };
+        });
+      } else {
+        // If there are no existing category titles, allow IA to propose an initial structure.
+        skillsData.categories = changes.skillsCategories.map(
+          (category, idx) => ({
+            id: `ai-category-${idx + 1}`,
+            name: category.name,
+            skills: category.skills,
+          }),
+        );
+      }
     }
   }
 
@@ -203,7 +214,8 @@ function buildSystemPrompt(mode: AnalysisMode): string {
     "You are an expert ATS resume optimization assistant.",
     "Return strict JSON only. No markdown.",
     scoreInstruction,
-    "Always keep the candidate's facts unchanged: contact identity and links, experience title/company/location/start/end/current, education degree/institution/dates.",
+    "Always keep the candidate's facts unchanged: contact identity and links, cv.title, section titles, contact.jobTitle, experience title/company/location/start/end/current, education degree/institution/dates, and existing skills category names.",
+    "Do not translate or rewrite any title/heading/label. Only improve descriptive content.",
     "You may improve only: about summary, experience descriptions, and skills lists.",
     "Keep the same language already used in cv.language.",
     "Output shape:",
