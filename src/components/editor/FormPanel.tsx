@@ -27,9 +27,8 @@ export function FormPanel() {
             <button
               key={mode}
               onClick={() => setMode(mode)}
-              className={`rounded px-2.5 py-1 text-xs transition-colors ${
-                viewMode === mode ? 'bg-zinc-600 text-white' : 'text-zinc-500 hover:text-zinc-300'
-              }`}
+              className={`rounded px-2.5 py-1 text-xs transition-colors ${viewMode === mode ? 'bg-zinc-600 text-white' : 'text-zinc-500 hover:text-zinc-300'
+                }`}
             >
               {mode === 'scroll' ? '≡ Scroll' : '⊟ Tabs'}
             </button>
