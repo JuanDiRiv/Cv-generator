@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { nanoid } from 'nanoid'
+import { Plus, Tag, FolderOpen } from 'lucide-react'
 import { useCVStore } from '@/store/cv-store'
 import type { SkillsData, SkillsDisplayMode, SkillCategory } from '@/types/cv'
 
@@ -59,13 +60,18 @@ export function SkillsForm({ sectionId }: Props) {
     <div className="flex flex-col gap-3">
       <div>
         <label className={labelCls}>Modo de visualización</label>
-        <div className="flex rounded-md bg-zinc-800 p-0.5 gap-0.5">
-          {(['chips', 'categories'] as SkillsDisplayMode[]).map(mode => (
-            <button key={mode} onClick={() => setMode(mode)}
-              className={`flex-1 rounded py-1.5 text-xs transition-colors ${data.displayMode === mode ? 'bg-indigo-600 text-white font-semibold' : 'text-zinc-500 hover:text-zinc-300'}`}>
-              {mode === 'chips' ? '🏷 Chips' : '📂 Categorías'}
-            </button>
-          ))}
+        <div className="flex gap-0.5 rounded-lg bg-zinc-800/80 p-0.5">
+          {(['chips', 'categories'] as SkillsDisplayMode[]).map(mode => {
+            const Icon = mode === 'chips' ? Tag : FolderOpen
+            const active = data.displayMode === mode
+            return (
+              <button key={mode} onClick={() => setMode(mode)}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-xs transition-colors ${active ? 'bg-indigo-600 text-white font-semibold shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}>
+                <Icon size={12} />
+                {mode === 'chips' ? 'Chips' : 'Categorías'}
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -114,8 +120,8 @@ export function SkillsForm({ sectionId }: Props) {
               />
             </div>
           ))}
-          <button onClick={addCategory} className="rounded-lg border border-dashed border-indigo-800 bg-indigo-950/30 py-2 text-xs text-indigo-400 hover:bg-indigo-950/60">
-            + Agregar categoría
+          <button onClick={addCategory} className="flex items-center justify-center gap-1.5 rounded-lg border border-dashed border-indigo-700/60 bg-indigo-950/30 py-2.5 text-xs font-medium text-indigo-300 transition-colors hover:border-indigo-500 hover:bg-indigo-950/60">
+            <Plus size={14} /> Agregar categoría
           </button>
         </>
       )}

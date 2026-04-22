@@ -1,7 +1,7 @@
 'use client'
 import { useCVStore } from '@/store/cv-store'
 import type { ContactData, ContactLink } from '@/types/cv'
-import { Mail, Phone, MapPin, Globe, X, Link as LinkIcon } from 'lucide-react'
+import { Mail, Phone, MapPin, Globe, X, Link as LinkIcon, Plus, Trash2 } from 'lucide-react'
 
 const inputCls = 'w-full rounded-lg bg-zinc-900 border border-zinc-700 px-3 py-2.5 text-sm text-zinc-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-colors'
 const inputWithIconCls = 'w-full rounded-lg bg-zinc-900 border border-zinc-700 pl-9 pr-3 py-2.5 text-sm text-zinc-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-colors'
@@ -106,15 +106,15 @@ export function ContactForm({ sectionId }: Props) {
                 value={link.url}
                 onChange={e => updateLink(i, 'url', e.target.value)}
               />
-              <button onClick={() => removeLink(i)} className="shrink-0 text-zinc-600 hover:text-red-400 text-lg leading-none">×</button>
+              <button onClick={() => removeLink(i)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-red-500/10 hover:text-red-400" aria-label="Eliminar link"><Trash2 size={13} /></button>
             </div>
           )
         })}
         <button
           onClick={addLink}
-          className="rounded-lg border border-dashed border-indigo-800 bg-indigo-950/30 py-2 text-xs text-indigo-400 hover:bg-indigo-950/60"
+          className="flex items-center justify-center gap-1.5 rounded-lg border border-dashed border-indigo-700/60 bg-indigo-950/30 py-2.5 text-xs font-medium text-indigo-300 transition-colors hover:border-indigo-500 hover:bg-indigo-950/60"
         >
-          + Agregar link
+          <Plus size={14} /> Agregar link
         </button>
       </div>
     </div>
