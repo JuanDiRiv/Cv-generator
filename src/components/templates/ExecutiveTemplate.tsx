@@ -55,7 +55,7 @@ export function ExecutiveTemplate({ cv, baselineCV, highlightChanges = false }: 
         {/* Left column */}
         <div className="flex-1 flex flex-col gap-5">
           {about?.summary && (
-            <div>
+            <div data-cv-section="about">
               <h2 className="text-[9px] font-bold uppercase tracking-widest mb-1.5 border-b pb-1" style={{ color: accent, borderColor: accent + '40' }}>Perfil Profesional</h2>
               <p className="text-[9.5px] leading-relaxed text-zinc-600">
                 <DiffText
@@ -68,7 +68,7 @@ export function ExecutiveTemplate({ cv, baselineCV, highlightChanges = false }: 
             </div>
           )}
           {experience && experience.entries.length > 0 && (
-            <div>
+            <div data-cv-section="experience">
               <h2 className="text-[9px] font-bold uppercase tracking-widest mb-3 border-b pb-1" style={{ color: accent, borderColor: accent + '40' }}>Experiencia</h2>
               {experience.displayMode === 'timeline' ? (
                 <div className="relative pl-3 border-l" style={{ borderColor: accent + '40' }}>
@@ -118,7 +118,7 @@ export function ExecutiveTemplate({ cv, baselineCV, highlightChanges = false }: 
         {/* Right column */}
         <div className="w-[70mm] flex flex-col gap-5">
           {skills && (
-            <div>
+            <div data-cv-section="skills">
               <h2 className="text-[9px] font-bold uppercase tracking-widest mb-2 border-b pb-1" style={{ color: accent, borderColor: accent + '40' }}>Habilidades</h2>
               {skills.displayMode === 'chips' ? (
                 <div className="flex flex-wrap gap-1">
@@ -159,7 +159,7 @@ export function ExecutiveTemplate({ cv, baselineCV, highlightChanges = false }: 
             </div>
           )}
           {education && education.entries.length > 0 && (
-            <div>
+            <div data-cv-section="education">
               <h2 className="text-[9px] font-bold uppercase tracking-widest mb-2 border-b pb-1" style={{ color: accent, borderColor: accent + '40' }}>Educación</h2>
               {education.entries.map(e => (
                 <div key={e.id} className="mb-2">
@@ -171,7 +171,7 @@ export function ExecutiveTemplate({ cv, baselineCV, highlightChanges = false }: 
             </div>
           )}
           {languages && languages.entries.length > 0 && (
-            <div>
+            <div data-cv-section="languages">
               <h2 className="text-[9px] font-bold uppercase tracking-widest mb-2 border-b pb-1" style={{ color: accent, borderColor: accent + '40' }}>Idiomas</h2>
               {languages.entries.map(l => <p key={l.id} className="text-[9px] text-zinc-600 leading-5">{l.language} — {l.level}</p>)}
             </div>

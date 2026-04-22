@@ -51,7 +51,7 @@ export function MinimalTemplate({ cv, baselineCV, highlightChanges = false }: Te
       )}
 
       {about?.summary && (
-        <div className="mb-5">
+        <div className="mb-5" data-cv-section="about">
           <h2 className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: accent }}>Perfil</h2>
           <p className="text-[9.5px] leading-relaxed text-zinc-600">
             <DiffText
@@ -65,7 +65,7 @@ export function MinimalTemplate({ cv, baselineCV, highlightChanges = false }: Te
       )}
 
       {experience && experience.entries.length > 0 && (
-        <div className="mb-5">
+        <div className="mb-5" data-cv-section="experience">
           <h2 className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: accent }}>Experiencia</h2>
           <div className="flex flex-col gap-3">
             {experience.entries.map(entry => (
@@ -92,7 +92,7 @@ export function MinimalTemplate({ cv, baselineCV, highlightChanges = false }: Te
 
       <div className="flex gap-8">
         {skills && (
-          <div className="flex-1">
+          <div className="flex-1" data-cv-section="skills">
             <h2 className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: accent }}>Habilidades</h2>
             {skills.displayMode === 'chips' ? (
               <div className="flex flex-wrap gap-1">
@@ -133,7 +133,7 @@ export function MinimalTemplate({ cv, baselineCV, highlightChanges = false }: Te
         )}
         <div className="flex flex-col gap-4 w-[45%]">
           {education && education.entries.length > 0 && (
-            <div>
+            <div data-cv-section="education">
               <h2 className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: accent }}>Educación</h2>
               {education.entries.map(e => (
                 <div key={e.id} className="mb-1.5">
@@ -145,7 +145,7 @@ export function MinimalTemplate({ cv, baselineCV, highlightChanges = false }: Te
             </div>
           )}
           {languages && languages.entries.length > 0 && (
-            <div>
+            <div data-cv-section="languages">
               <h2 className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: accent }}>Idiomas</h2>
               {languages.entries.map(l => <p key={l.id} className="text-[9px] text-zinc-600 leading-5">{l.language} — {l.level}</p>)}
             </div>

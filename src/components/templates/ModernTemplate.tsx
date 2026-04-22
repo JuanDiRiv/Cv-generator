@@ -52,7 +52,7 @@ export function ModernTemplate({ cv, baselineCV, highlightChanges = false }: Tem
           </>
         )}
         {skills && (
-          <div>
+          <div data-cv-section="skills">
             <p className="text-[8px] font-bold uppercase tracking-widest mb-2 opacity-60 border-b border-white/20 pb-1">Habilidades</p>
             {skills.displayMode === 'chips' ? (
               <div className="flex flex-wrap gap-1">
@@ -92,7 +92,7 @@ export function ModernTemplate({ cv, baselineCV, highlightChanges = false }: Tem
           </div>
         )}
         {languages && languages.entries.length > 0 && (
-          <div>
+          <div data-cv-section="languages">
             <p className="text-[8px] font-bold uppercase tracking-widest mb-2 opacity-60 border-b border-white/20 pb-1">Idiomas</p>
             {languages.entries.map(l => <p key={l.id} className="text-[9px] opacity-80 leading-5">{l.language} — {l.level}</p>)}
           </div>
@@ -100,7 +100,7 @@ export function ModernTemplate({ cv, baselineCV, highlightChanges = false }: Tem
       </div>
       <div className="flex-1 p-7 flex flex-col gap-5">
         {about?.summary && (
-          <div>
+          <div data-cv-section="about">
             <h2 className="border-l-[3px] pl-2 text-[10px] font-bold uppercase tracking-wider mb-2" style={{ borderColor: accent, color: accent }}>Sobre mí</h2>
             <p className="text-[9.5px] leading-relaxed text-zinc-600">
               <DiffText
@@ -113,7 +113,7 @@ export function ModernTemplate({ cv, baselineCV, highlightChanges = false }: Tem
           </div>
         )}
         {experience && experience.entries.length > 0 && (
-          <div>
+          <div data-cv-section="experience">
             <h2 className="border-l-[3px] pl-2 text-[10px] font-bold uppercase tracking-wider mb-3" style={{ borderColor: accent, color: accent }}>Experiencia</h2>
             {experience.displayMode === 'timeline' ? (
               <div className="relative pl-4 border-l-2" style={{ borderColor: accent + '50' }}>
@@ -159,7 +159,7 @@ export function ModernTemplate({ cv, baselineCV, highlightChanges = false }: Tem
           </div>
         )}
         {education && education.entries.length > 0 && (
-          <div>
+          <div data-cv-section="education">
             <h2 className="border-l-[3px] pl-2 text-[10px] font-bold uppercase tracking-wider mb-2" style={{ borderColor: accent, color: accent }}>Educación</h2>
             {education.entries.map(e => (
               <div key={e.id} className="mb-2">

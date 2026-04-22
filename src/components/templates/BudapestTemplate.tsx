@@ -64,7 +64,7 @@ export function BudapestTemplate({ cv, baselineCV, highlightChanges = false }: T
         )}
 
         {skills && (
-          <div>
+          <div data-cv-section="skills">
             <p className="mb-2 border-b pb-1 text-[8px] font-bold uppercase tracking-widest" style={{ color: accent, borderColor: '#2a2a4e' }}>Habilidades</p>
             {skills.displayMode === 'chips' ? (
               <div className="flex flex-wrap gap-1">
@@ -102,7 +102,7 @@ export function BudapestTemplate({ cv, baselineCV, highlightChanges = false }: T
         )}
 
         {languages && languages.entries.length > 0 && (
-          <div>
+          <div data-cv-section="languages">
             <p className="mb-2 border-b pb-1 text-[8px] font-bold uppercase tracking-widest" style={{ color: accent, borderColor: '#2a2a4e' }}>Idiomas</p>
             {languages.entries.map(l => (
               <p key={l.id} className="text-[9px] text-zinc-400 leading-5">{l.language} — {l.level}</p>
@@ -121,7 +121,7 @@ export function BudapestTemplate({ cv, baselineCV, highlightChanges = false }: T
         )}
 
         {about?.summary && (
-          <div>
+          <div data-cv-section="about">
             <h2 className="mb-2 border-l-[3px] pl-2 text-[10px] font-bold uppercase tracking-wider" style={{ borderColor: accent, color: '#1a1a2e' }}>Sobre mí</h2>
             <p className="text-[9.5px] leading-relaxed text-zinc-600">
               <DiffText
@@ -135,7 +135,7 @@ export function BudapestTemplate({ cv, baselineCV, highlightChanges = false }: T
         )}
 
         {experience && experience.entries.length > 0 && (
-          <div>
+          <div data-cv-section="experience">
             <h2 className="mb-3 border-l-[3px] pl-2 text-[10px] font-bold uppercase tracking-wider" style={{ borderColor: accent, color: '#1a1a2e' }}>Experiencia</h2>
             {experience.displayMode === 'timeline' ? (
               <div className="relative pl-4 border-l-2" style={{ borderColor: accent + '60' }}>
@@ -188,7 +188,7 @@ export function BudapestTemplate({ cv, baselineCV, highlightChanges = false }: T
         )}
 
         {education && education.entries.length > 0 && (
-          <div>
+          <div data-cv-section="education">
             <h2 className="mb-3 border-l-[3px] pl-2 text-[10px] font-bold uppercase tracking-wider" style={{ borderColor: accent, color: '#1a1a2e' }}>Educación</h2>
             <div className="flex flex-col gap-2">
               {education.entries.map((entry) => (

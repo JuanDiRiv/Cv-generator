@@ -6,12 +6,12 @@ import type { CVDocument } from '@/types/cv'
 interface Props { onClose: () => void }
 
 export function ExportModal({ onClose }: Props) {
-  const { cv, aiSuggestionCV, activePreviewTab } = useCVStore()
+  const { cv, aiSuggestionCV } = useCVStore()
   const [translating, setTranslating] = useState<'es' | 'en' | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const exportPDF = async (targetLang: 'es' | 'en') => {
-    const sourceCV = activePreviewTab === 'ai' && aiSuggestionCV ? aiSuggestionCV : cv
+    const sourceCV = aiSuggestionCV ?? cv
     if (!sourceCV) return
     setTranslating(targetLang)
     setError(null)
@@ -40,8 +40,7 @@ export function ExportModal({ onClose }: Props) {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      const tabSuffix = activePreviewTab === 'ai' ? '_AI' : '_ORIGINAL'
-      a.download = `${dataToExport.title || 'CV'}${tabSuffix}_${targetLang.toUpperCase()}.pdf`
+      a.download = `${dataToExport.title || 'CV'}_${targetLang.toUpperCase()}.pdf`
       a.click()
       setTimeout(() => URL.revokeObjectURL(url), 100)
 
@@ -57,10 +56,7 @@ export function ExportModal({ onClose }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
       <div className="w-80 rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
         <h2 className="mb-1 text-base font-bold">Exportar PDF</h2>
-        <p className="mb-1 text-xs text-zinc-500">La IA detecta el idioma y traduce automáticamente si es necesario.</p>
-        <p className="mb-5 text-[11px] font-semibold text-indigo-300">
-          Tab activa: {activePreviewTab === 'ai' ? 'AI suggestions' : 'Original'}
-        </p>
+        <p className="mb-5 text-xs text-zinc-500">La IA detecta el idioma y traduce automáticamente si es necesario.</p>
 
         {error && (
           <p className="mb-3 rounded-lg bg-red-900/30 border border-red-800 px-3 py-2 text-xs text-red-400">{error}</p>

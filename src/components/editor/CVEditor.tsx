@@ -8,6 +8,7 @@ import { applyImportedDataToCV, normalizeImportedCV } from '@/lib/cv-import'
 import { FormPanel } from './FormPanel'
 import { PreviewPanel } from './PreviewPanel'
 import { ExportModal } from '@/components/ui/ExportModal'
+import { AITextResultModal } from '@/components/ui/AITextResultModal'
 import { AutoSaveIndicator } from '@/components/ui/AutoSaveIndicator'
 
 interface Props { cvId: string }
@@ -20,14 +21,10 @@ export function CVEditor({ cvId }: Props) {
     cv,
     isDirty,
     isSaving,
-    aiSuggestionCV,
-    activePreviewTab,
     setIsSaving,
     markSaved,
     updateField,
     setCV,
-    setActivePreviewTab,
-    clearAISuggestion,
   } = useCVStore()
   const [showExport, setShowExport] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
@@ -116,10 +113,6 @@ export function CVEditor({ cvId }: Props) {
     await onImportFile(file)
   }
 
-  const closeAITab = () => {
-    clearAISuggestion()
-  }
-
   return (
     <div className="flex h-screen flex-col bg-zinc-950 text-white overflow-hidden">
       {/* Header */}
@@ -131,37 +124,6 @@ export function CVEditor({ cvId }: Props) {
           onChange={(e) => updateField('title', e.target.value)}
           className="flex-1 bg-transparent text-sm text-zinc-300 outline-none border-b border-transparent focus:border-indigo-500 px-1 py-0.5"
         />
-        <div className="flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900 p-1">
-          <button
-            onClick={() => setActivePreviewTab('original')}
-            className={`rounded px-2 py-1 text-[11px] font-semibold transition-colors ${activePreviewTab === 'original'
-                ? 'bg-zinc-700 text-white'
-                : 'text-zinc-400 hover:text-zinc-200'
-              }`}
-          >
-            Original
-          </button>
-          {aiSuggestionCV && (
-            <div className="flex items-center rounded border border-zinc-700 bg-zinc-800/70">
-              <button
-                onClick={() => setActivePreviewTab('ai')}
-                className={`px-2 py-1 text-[11px] font-semibold transition-colors ${activePreviewTab === 'ai'
-                    ? 'text-indigo-300'
-                    : 'text-zinc-300 hover:text-zinc-100'
-                  }`}
-              >
-                AI suggestions
-              </button>
-              <button
-                onClick={closeAITab}
-                className="px-1.5 py-1 text-[11px] text-zinc-400 hover:text-red-300"
-                aria-label="Cerrar tab de AI suggestions"
-              >
-                x
-              </button>
-            </div>
-          )}
-        </div>
         <AutoSaveIndicator isSaving={isSaving} isDirty={isDirty} />
         {importMessage && (
           <span className="max-w-[320px] truncate text-[11px] text-zinc-400">{importMessage}</span>
@@ -194,6 +156,7 @@ export function CVEditor({ cvId }: Props) {
         <PreviewPanel />
       </div>
 
+      <AITextResultModal />
       {showExport && <ExportModal onClose={() => setShowExport(false)} />}
     </div>
   )
