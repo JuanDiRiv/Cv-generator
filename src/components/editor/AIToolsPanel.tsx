@@ -4,7 +4,7 @@ import { useState } from 'react'
 import {
   Sparkles, Target, FileSearch, Languages, Search, ListChecks,
   Mail, MessageSquare, Minimize2, SpellCheck, BarChart3, Mic2,
-  ChevronDown, Loader2,
+  ChevronDown, Loader2, Globe,
 } from 'lucide-react'
 import { useCVStore, type AIAnalysisReport, type AITextResult } from '@/store/cv-store'
 import type { CVDocument } from '@/types/cv'
@@ -75,7 +75,8 @@ export function AIToolsPanel() {
   const [error, setError] = useState<string | null>(null)
   const [jobOffer, setJobOffer] = useState('')
   const [tone, setTone] = useState(TONES[0])
-  const [language, setLanguage] = useState<'EN' | 'ES'>('EN')
+  const initialLanguage: 'EN' | 'ES' = cv?.language === 'es' ? 'ES' : 'EN'
+  const [language, setLanguage] = useState<'EN' | 'ES'>(initialLanguage)
 
   if (!cv) return null
 
@@ -100,7 +101,7 @@ export function AIToolsPanel() {
           cv,
           jobOffer: tool.needsOffer ? jobOffer : undefined,
           tone: tool.needsTone ? tone : undefined,
-          language: tool.needsLanguage || tool.output === 'text' ? language : undefined,
+          language,
         }),
       })
 
@@ -130,14 +131,40 @@ export function AIToolsPanel() {
   }
 
   const needsAnyConfig = TOOLS.some(
-    (t) => activeTool === t.mode && (t.needsOffer || t.needsTone || t.needsLanguage),
+    (t) => activeTool === t.mode && (t.needsOffer || t.needsTone),
   )
   const activeDef = TOOLS.find((t) => t.mode === activeTool)
 
+  const LANGUAGES: { code: 'EN' | 'ES'; label: string }[] = [
+    { code: 'EN', label: 'Inglés' },
+    { code: 'ES', label: 'Español' },
+  ]
+
   return (
     <div className="flex flex-col gap-3">
+      {/* Global language selector */}
+      <div className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-2.5 py-2">
+        <Globe size={13} className="text-zinc-400" />
+        <span className="text-[11px] font-semibold text-zinc-300">Idioma de salida</span>
+        <div className="ml-auto flex gap-1">
+          {LANGUAGES.map((l) => (
+            <button
+              key={l.code}
+              type="button"
+              onClick={() => setLanguage(l.code)}
+              className={`rounded-md border px-2.5 py-1 text-[11px] font-semibold transition-colors ${language === l.code
+                ? 'border-indigo-500 bg-indigo-500/20 text-indigo-100'
+                : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
+                }`}
+            >
+              {l.code} · {l.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <p className="text-[11px] text-zinc-500">
-        Las herramientas que modifican el CV abren un modo revisión en la vista previa donde puedes aceptar o descartar cambios por sección.
+        Las herramientas que modifican el CV abren un modo revisión en la vista previa donde puedes aceptar o descartar cambios por sección. Todo el contenido reescrito se entregará en <span className="font-semibold text-zinc-300">{language === 'EN' ? 'Inglés' : 'Español'}</span>.
       </p>
 
       {/* Config drawer */}
@@ -177,21 +204,6 @@ export function AIToolsPanel() {
             </div>
           )}
 
-          {activeDef.needsLanguage && (
-            <div className="flex gap-1">
-              {(['EN', 'ES'] as const).map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setLanguage(l)}
-                  className={`rounded-md border px-3 py-1 text-[11px] font-semibold transition-colors ${language === l
-                    ? 'border-indigo-500 bg-indigo-500/20 text-indigo-100'
-                    : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                    }`}
-                >{l}</button>
-              ))}
-            </div>
-          )}
-
           <button
             onClick={() => runTool(activeDef)}
             disabled={running !== null}
@@ -209,7 +221,7 @@ export function AIToolsPanel() {
           const Icon = tool.icon
           const isRunning = running === tool.mode
           const isActive = activeTool === tool.mode
-          const needsConfig = tool.needsOffer || tool.needsTone || tool.needsLanguage
+          const needsConfig = tool.needsOffer || tool.needsTone
 
           return (
             <button

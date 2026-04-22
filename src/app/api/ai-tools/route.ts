@@ -243,9 +243,15 @@ const CHANGES_SHAPE =
 
 function buildCVSystemPrompt(
   mode: ToolMode,
-  options: { tone?: string } = {},
+  options: { tone?: string; language?: string } = {},
 ): string {
   const lines = [...BASE_RULES];
+
+  if (options.language) {
+    lines.push(
+      `Write all rewritten descriptive content (about summary, experience descriptions, skills) in ${options.language}. Translate from the source language if necessary, but keep proper nouns, brand names and technologies untouched.`,
+    );
+  }
 
   switch (mode) {
     case "job-match":
@@ -336,7 +342,7 @@ async function runCVMode(
   client: OpenAI,
   mode: ToolMode,
   cv: CVDocument,
-  options: { jobOffer?: string; tone?: string },
+  options: { jobOffer?: string; tone?: string; language?: string },
 ) {
   const completion = await client.chat.completions.create({
     model: "gpt-5.4-mini",
@@ -351,6 +357,7 @@ async function runCVMode(
           cv,
           jobOffer: options.jobOffer ?? null,
           tone: options.tone ?? null,
+          targetLanguage: options.language ?? null,
         }),
       },
     ],
@@ -567,6 +574,13 @@ export async function POST(request: Request) {
 
     const client = new OpenAI({ apiKey });
 
+    const languageName =
+      language === "EN" || language === "en"
+        ? "English"
+        : language === "ES" || language === "es"
+          ? "Spanish"
+          : language;
+
     if (mode === "translate") {
       const target: "EN" | "ES" = language === "ES" ? "ES" : "EN";
       const result = await runTranslateMode(apiKey, cv, target);
@@ -574,14 +588,18 @@ export async function POST(request: Request) {
     }
 
     if (CV_TOOLS.has(mode)) {
-      const result = await runCVMode(client, mode, cv, { jobOffer, tone });
+      const result = await runCVMode(client, mode, cv, {
+        jobOffer,
+        tone,
+        language: languageName,
+      });
       return Response.json(result);
     }
 
     if (TEXT_TOOLS.has(mode)) {
       const result = await runTextMode(client, mode, cv, {
         jobOffer,
-        language,
+        language: languageName,
       });
       return Response.json(result);
     }
