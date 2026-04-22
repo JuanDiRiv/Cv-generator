@@ -256,8 +256,17 @@ function buildCVSystemPrompt(
   switch (mode) {
     case "job-match":
       lines.push(
-        "Set score (0-100) based on fit against the job offer.",
-        "Rewrite about/experience/skills to better match the offer with measurable outcomes.",
+        "Compute a realistic, conservative fit score (0-100) for the candidate vs. the job offer based on this rubric:",
+        "- 40 pts: required hard skills / tools coverage (count present vs. required)",
+        "- 20 pts: years and seniority match",
+        "- 15 pts: domain / industry experience match",
+        "- 15 pts: measurable impact relevant to the role's outcomes",
+        "- 10 pts: soft skills, language, location and other secondary requirements",
+        "Penalize honestly: if a required skill is missing subtract its share; cap at 60 if any 'must-have' is absent; cap at 40 if seniority is clearly below.",
+        "Do NOT inflate the score; round to the nearest 5.",
+        "In `summary` explain the score in 1-2 sentences (matched strengths and main gaps).",
+        "List concrete missing requirements in `missingKeywords` and prioritized improvements in `recommendations`.",
+        "Then rewrite about/experience/skills to better match the offer with measurable outcomes — but keep the score reflecting the CURRENT cv (not the rewritten one).",
       );
       break;
     case "cv-review":

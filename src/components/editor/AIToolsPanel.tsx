@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
-  Sparkles, Target, FileSearch, Languages, Search, ListChecks,
+  Sparkles, Target, FileSearch, Languages, Search,
   Mail, MessageSquare, Minimize2, SpellCheck, BarChart3, Mic2,
-  ChevronDown, Loader2, Globe,
+  ChevronDown, Loader2, Globe, X,
 } from 'lucide-react'
 import { useCVStore, type AIAnalysisReport, type AITextResult } from '@/store/cv-store'
 import type { CVDocument } from '@/types/cv'
@@ -68,6 +68,13 @@ interface ToolResponse {
   error?: string
 }
 
+interface JobMatchResult {
+  score: number
+  summary: string
+  missingKeywords: string[]
+  recommendations: string[]
+}
+
 export function AIToolsPanel() {
   const { cv, setAISuggestion, setAITextResult } = useCVStore()
   const [activeTool, setActiveTool] = useState<ToolMode | null>(null)
@@ -77,6 +84,27 @@ export function AIToolsPanel() {
   const [tone, setTone] = useState(TONES[0])
   const initialLanguage: 'EN' | 'ES' = cv?.language === 'es' ? 'ES' : 'EN'
   const [language, setLanguage] = useState<'EN' | 'ES'>(initialLanguage)
+  const [jobMatchResult, setJobMatchResult] = useState<JobMatchResult | null>(null)
+  const [animatedScore, setAnimatedScore] = useState(0)
+
+  useEffect(() => {
+    if (!jobMatchResult) {
+      setAnimatedScore(0)
+      return
+    }
+    const target = jobMatchResult.score
+    const start = performance.now()
+    const duration = 900
+    let raf = 0
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration)
+      const eased = 1 - Math.pow(1 - t, 3)
+      setAnimatedScore(Math.round(target * eased))
+      if (t < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [jobMatchResult])
 
   if (!cv) return null
 
@@ -113,6 +141,14 @@ export function AIToolsPanel() {
           throw new Error('Respuesta incompleta de IA')
         }
         setAISuggestion(payload.suggestedCV, payload.analysis)
+        if (tool.mode === 'job-match' && typeof payload.analysis.score === 'number') {
+          setJobMatchResult({
+            score: payload.analysis.score,
+            summary: payload.analysis.summary,
+            missingKeywords: payload.analysis.missingKeywords,
+            recommendations: payload.analysis.recommendations,
+          })
+        }
       } else {
         if (!payload.text) throw new Error('Respuesta vacía de IA')
         const result: AITextResult = {
@@ -166,6 +202,16 @@ export function AIToolsPanel() {
       <p className="text-[11px] text-zinc-500">
         Las herramientas que modifican el CV abren un modo revisión en la vista previa donde puedes aceptar o descartar cambios por sección. Todo el contenido reescrito se entregará en <span className="font-semibold text-zinc-300">{language === 'EN' ? 'Inglés' : 'Español'}</span>.
       </p>
+
+      {/* Job Match score card */}
+      {(running === 'job-match' || jobMatchResult) && (
+        <JobMatchCard
+          loading={running === 'job-match'}
+          result={jobMatchResult}
+          animatedScore={animatedScore}
+          onClose={() => setJobMatchResult(null)}
+        />
+      )}
 
       {/* Config drawer */}
       {needsAnyConfig && activeDef && (
@@ -271,8 +317,104 @@ export function AIToolsPanel() {
           {error}
         </p>
       )}
+    </div>
+  )
+}
 
-      <ListChecks className="hidden" />
+function scoreColor(score: number) {
+  if (score >= 80) return { bar: '#10b981', text: 'text-emerald-300', bg: 'bg-emerald-500/10', label: 'Excelente match' }
+  if (score >= 60) return { bar: '#84cc16', text: 'text-lime-300', bg: 'bg-lime-500/10', label: 'Buen match' }
+  if (score >= 40) return { bar: '#f59e0b', text: 'text-amber-300', bg: 'bg-amber-500/10', label: 'Match parcial' }
+  return { bar: '#ef4444', text: 'text-red-300', bg: 'bg-red-500/10', label: 'Match bajo' }
+}
+
+function JobMatchCard({
+  loading,
+  result,
+  animatedScore,
+  onClose,
+}: {
+  loading: boolean
+  result: JobMatchResult | null
+  animatedScore: number
+  onClose: () => void
+}) {
+  const score = result?.score ?? 0
+  const colors = scoreColor(score)
+  const showValue = loading ? null : animatedScore
+
+  return (
+    <div className={`relative overflow-hidden rounded-xl border border-zinc-800 ${loading ? 'bg-zinc-950' : colors.bg} p-3.5`}>
+      {!loading && result && (
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200"
+          aria-label="Cerrar"
+        >
+          <X size={12} />
+        </button>
+      )}
+
+      <div className="flex items-center gap-2">
+        <Target size={13} className={loading ? 'text-zinc-400 animate-pulse' : colors.text} />
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-300">
+          Job Match
+        </span>
+        {!loading && result && (
+          <span className={`ml-auto mr-7 text-[10px] font-semibold ${colors.text}`}>
+            {colors.label}
+          </span>
+        )}
+      </div>
+
+      <div className="mt-3 flex items-end justify-between">
+        <div className="flex items-baseline gap-1">
+          {loading ? (
+            <span className="text-2xl font-bold text-zinc-600">—</span>
+          ) : (
+            <span className={`text-3xl font-bold tabular-nums ${colors.text}`}>{showValue}</span>
+          )}
+          <span className="text-xs text-zinc-500">/ 100</span>
+        </div>
+        {loading && (
+          <span className="flex items-center gap-1 text-[10px] text-zinc-400">
+            <Loader2 size={11} className="animate-spin" /> Analizando oferta…
+          </span>
+        )}
+      </div>
+
+      <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-800">
+        {loading ? (
+          <div className="h-full w-1/3 animate-pulse rounded-full bg-zinc-700" />
+        ) : (
+          <div
+            className="h-full rounded-full transition-all duration-700 ease-out"
+            style={{ width: `${animatedScore}%`, background: colors.bar }}
+          />
+        )}
+      </div>
+
+      {!loading && result && (
+        <>
+          <p className="mt-2.5 text-[11px] leading-relaxed text-zinc-300">{result.summary}</p>
+
+          {result.missingKeywords.length > 0 && (
+            <div className="mt-2.5">
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                Falta o está débil
+              </p>
+              <div className="flex flex-wrap gap-1">
+                {result.missingKeywords.map((k) => (
+                  <span key={k} className="rounded bg-zinc-900/80 px-1.5 py-0.5 text-[10px] text-zinc-300">
+                    {k}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }
