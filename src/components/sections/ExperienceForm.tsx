@@ -2,7 +2,7 @@
 import { nanoid } from 'nanoid'
 import { Trash2, Plus, List, GitBranch } from 'lucide-react'
 import { useCVStore } from '@/store/cv-store'
-import { AutoTextarea } from '@/components/ui/AutoTextarea'
+import { AIRewriteTextarea } from '@/components/ui/AIRewriteTextarea'
 import type { ExperienceData, ExperienceEntry, ExperienceDisplayMode } from '@/types/cv'
 
 const inputCls = 'w-full rounded-lg bg-zinc-900 border border-zinc-700 px-3 py-2.5 text-sm text-zinc-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-colors'
@@ -103,16 +103,15 @@ export function ExperienceForm({ sectionId }: Props) {
               </label>
             </div>
             <div>
-              <div className="mb-1.5 flex items-center justify-between">
-                <label className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">Descripción</label>
-                <span className="text-[10px] tabular-nums text-zinc-600">{(entry.description ?? '').length} caracteres</span>
-              </div>
-              <AutoTextarea
+              <AIRewriteTextarea
+                label="Descripción"
+                placeholder="Cuenta lo que hiciste en este puesto: proyectos, tecnologías, impacto. La IA lo convertirá en bullets ATS-friendly que empiezan con •."
+                helper="Bullets generados con •"
                 minRows={3}
-                placeholder="• Logros medibles, tecnologías, impacto en negocio..."
-                className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-200 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30"
+                field="experience-description"
+                context={{ title: entry.title, company: entry.company, location: entry.location }}
                 value={entry.description}
-                onChange={e => updateEntry(entry.id, 'description', e.target.value)}
+                onChange={(text) => updateEntry(entry.id, 'description', text)}
               />
             </div>
           </div>

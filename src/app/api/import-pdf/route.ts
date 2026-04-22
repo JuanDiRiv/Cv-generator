@@ -4,7 +4,7 @@ import { normalizeImportedCV, type ImportedCVPayload } from "@/lib/cv-import";
 export const runtime = "nodejs";
 
 const MAX_PDF_SIZE_BYTES = 8 * 1024 * 1024;
-const IMPORT_MODEL = "gpt-5.4-nano";
+const IMPORT_MODEL = "gpt-5.4-mini";
 
 const BASE_SYSTEM_PROMPT =
   'You are an expert resume parser. Convert the provided raw PDF text into a strict JSON object for a CV editor. Do not include markdown. Do not include explanations. Never invent details that are not present in the text. If data is missing, return empty strings or empty arrays. Preserve full wording for summaries and descriptions: do not summarize, do not shorten, do not paraphrase. Keep all bullet points and line breaks when present. Output object keys exactly: language, title, contact, about, experience, education, skills, languages. language must be "es" or "en". contact fields: firstName,lastName,jobTitle,email,phone,location,links[{label,url}]. about: {summary}. experience: {displayMode, entries[{title,company,location,startDate,endDate,current,description}]}. education: {entries[{degree,institution,startDate,endDate,description}]}. skills: {displayMode, chips[string], categories[{name,skills[string]}]}. languages: {entries[{language,level}]}. IMPORTANT for experience: create one entry per distinct role/company/date range; never merge multiple jobs into one entry even if the PDF text is continuous.';

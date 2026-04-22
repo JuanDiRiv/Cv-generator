@@ -257,7 +257,7 @@ export async function POST(request: Request) {
 
     const client = new OpenAI({ apiKey });
     const completion = await client.chat.completions.create({
-      model: "gpt-5.4-nano",
+      model: "gpt-5.4-mini",
       temperature: 0.2,
       response_format: { type: "json_object" },
       messages: [
