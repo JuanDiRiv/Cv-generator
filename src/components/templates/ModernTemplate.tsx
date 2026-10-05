@@ -29,6 +29,10 @@ export function ModernTemplate({ cv, baselineCV, highlightChanges = false }: Tem
       <div className="w-[78mm] shrink-0 p-6 flex flex-col gap-5" style={{ background: accent, color: 'rgba(255,255,255,0.9)' }}>
         {contact && (
           <>
+            {contact.photo && (
+              // eslint-disable-next-line @next/next/no-img-element -- data URL, nothing to optimize
+              <img src={contact.photo} alt="" className="h-20 w-20 rounded-full object-cover border-2 border-white/40" />
+            )}
             <div>
               <h2 className="text-[13px] font-bold text-white leading-tight">{contact.firstName} {contact.lastName}</h2>
               <p className="text-[9.5px] font-semibold mt-1 opacity-80 uppercase tracking-widest">{contact.jobTitle}</p>

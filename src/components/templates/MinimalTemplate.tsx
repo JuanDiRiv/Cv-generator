@@ -28,9 +28,15 @@ export function MinimalTemplate({ cv, baselineCV, highlightChanges = false }: Te
     <div className="font-sans" style={{ width: '210mm', minHeight: '297mm', background: '#fff', padding: '14mm 16mm', color: '#111' }}>
       {contact && (
         <div className="flex items-start justify-between border-b-2 pb-4 mb-5" style={{ borderColor: '#111' }}>
-          <div>
-            <h1 className="text-[22px] font-bold tracking-tight">{contact.firstName} {contact.lastName}</h1>
-            <p className="text-[11px] font-semibold mt-0.5" style={{ color: accent }}>{contact.jobTitle}</p>
+          <div className="flex items-center gap-3">
+            {contact.photo && (
+              // eslint-disable-next-line @next/next/no-img-element -- data URL, nothing to optimize
+              <img src={contact.photo} alt="" className="h-14 w-14 rounded-full object-cover" />
+            )}
+            <div>
+              <h1 className="text-[22px] font-bold tracking-tight">{contact.firstName} {contact.lastName}</h1>
+              <p className="text-[11px] font-semibold mt-0.5" style={{ color: accent }}>{contact.jobTitle}</p>
+            </div>
           </div>
           <div className="text-right text-[9px] text-zinc-500 leading-5 flex flex-col items-end gap-0.5">
             {contact.email && <div className="flex items-center gap-1.5"><span>{contact.email}</span><Mail size={8} className="shrink-0 text-zinc-400" /></div>}

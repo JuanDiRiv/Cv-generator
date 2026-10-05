@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
+import { Document, Page, View, Text, Link, Image } from '@react-pdf/renderer'
 import { MailIcon, PhoneIcon, MapPinIcon, pdfLinkIcon } from './icons'
 import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
@@ -23,9 +23,15 @@ export function ExecutivePDF({ cv }: Props) {
 
         {/* ── Dark header ── */}
         <View style={{ backgroundColor: '#1a1a1a', paddingHorizontal: 28, paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-          <View>
-            <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold', color: '#ffffff' }}>{contact?.firstName} {contact?.lastName}</Text>
-            <Text style={{ fontSize: 8.5, color: accent, marginTop: 4, fontFamily: 'Helvetica-Bold' }}>{contact?.jobTitle?.toUpperCase()}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {contact?.photo && (
+              // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop
+              <Image src={contact.photo} style={{ width: 48, height: 48, borderRadius: 24, objectFit: 'cover', borderWidth: 1.5, borderColor: accent, marginRight: 12 }} />
+            )}
+            <View>
+              <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold', color: '#ffffff' }}>{contact?.firstName} {contact?.lastName}</Text>
+              <Text style={{ fontSize: 8.5, color: accent, marginTop: 4, fontFamily: 'Helvetica-Bold' }}>{contact?.jobTitle?.toUpperCase()}</Text>
+            </View>
           </View>
           {contact && (
             <View style={{ alignItems: 'flex-end' }}>

@@ -16,7 +16,7 @@ interface RewriteRequest {
   };
 }
 
-const MODEL = "gpt-5.4-mini";
+const MODEL = "gpt-6-luna";
 
 const LANGUAGE_LABEL: Record<string, string> = {
   es: "español",
@@ -106,7 +106,6 @@ export async function POST(request: Request) {
     const client = new OpenAI({ apiKey });
     const completion = await client.chat.completions.create({
       model: MODEL,
-      temperature: 0.3,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: buildPrompt(field, language, body.context) },

@@ -2,6 +2,7 @@
 import { useCVStore } from '@/store/cv-store'
 import type { ContactData, ContactLink } from '@/types/cv'
 import { Mail, Phone, MapPin, Globe, X, Link as LinkIcon, Plus, Trash2 } from 'lucide-react'
+import { PhotoPicker } from './PhotoPicker'
 
 const inputCls = 'w-full rounded-lg bg-zinc-900 border border-zinc-700 px-3 py-2.5 text-sm text-zinc-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-colors'
 const inputWithIconCls = 'w-full rounded-lg bg-zinc-900 border border-zinc-700 pl-9 pr-3 py-2.5 text-sm text-zinc-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-colors'
@@ -24,8 +25,16 @@ export function ContactForm({ sectionId }: Props) {
   if (!section) return null
   const data = section.data as ContactData
 
-  const update = (field: keyof Omit<ContactData, 'links'>, value: string) =>
+  const update = (field: keyof Omit<ContactData, 'links' | 'photo'>, value: string) =>
     updateSection(sectionId, { data: { ...data, [field]: value } })
+
+  // Firestore rejects `undefined` values, so removing the photo drops the key entirely
+  const setPhoto = (photo: string | undefined) => {
+    const next = { ...data }
+    if (photo) next.photo = photo
+    else delete next.photo
+    updateSection(sectionId, { data: next })
+  }
 
   const links = data.links ?? []
 
@@ -44,6 +53,10 @@ export function ContactForm({ sectionId }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
+      <div>
+        <label className={labelCls}>Foto</label>
+        <PhotoPicker value={data.photo} onChange={setPhoto} />
+      </div>
       <div className="flex gap-2">
         <div className="flex-1">
           <label className={labelCls}>Nombre</label>

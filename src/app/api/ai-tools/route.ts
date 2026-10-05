@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import type {
   CVDocument,
   AboutData,
+  ContactData,
   ExperienceData,
   SkillsData,
 } from "@/types/cv";
@@ -152,6 +153,19 @@ function normalizeModelResponse(
       skillsChips: asStringArray(raw.changes?.skillsChips, 20),
       skillsCategories: asSkillsCategories(raw.changes?.skillsCategories),
     },
+  };
+}
+
+// The profile photo is a base64 data URL: useless to the model and very expensive in tokens
+function stripPhotoForModel(cv: CVDocument): CVDocument {
+  return {
+    ...cv,
+    sections: cv.sections.map((section) => {
+      if (section.type !== "contact") return section;
+      const data = { ...(section.data as ContactData) };
+      delete data.photo;
+      return { ...section, data };
+    }),
   };
 }
 
@@ -354,8 +368,7 @@ async function runCVMode(
   options: { jobOffer?: string; tone?: string; language?: string },
 ) {
   const completion = await client.chat.completions.create({
-    model: "gpt-5.4-mini",
-    temperature: 0.2,
+    model: "gpt-6-luna",
     response_format: { type: "json_object" },
     messages: [
       { role: "system", content: buildCVSystemPrompt(mode, options) },
@@ -363,7 +376,7 @@ async function runCVMode(
         role: "user",
         content: JSON.stringify({
           mode,
-          cv,
+          cv: stripPhotoForModel(cv),
           jobOffer: options.jobOffer ?? null,
           tone: options.tone ?? null,
           targetLanguage: options.language ?? null,
@@ -399,8 +412,7 @@ async function runTextMode(
   options: { jobOffer?: string; language?: string },
 ) {
   const completion = await client.chat.completions.create({
-    model: "gpt-5.4-mini",
-    temperature: 0.4,
+    model: "gpt-6-luna",
     response_format: { type: "json_object" },
     messages: [
       { role: "system", content: buildTextSystemPrompt(mode, options) },
@@ -408,7 +420,7 @@ async function runTextMode(
         role: "user",
         content: JSON.stringify({
           mode,
-          cv,
+          cv: stripPhotoForModel(cv),
           jobOffer: options.jobOffer ?? null,
         }),
       },

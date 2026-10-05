@@ -29,7 +29,7 @@ export function ExperienceForm({ sectionId }: Props) {
       id: nanoid(), title: '', company: '', location: '',
       startDate: '', endDate: '', current: false, description: '',
     }
-    updateSection(sectionId, { data: { ...data, entries: [...data.entries, entry] } })
+    updateSection(sectionId, { data: { ...data, entries: [entry, ...data.entries] } })
   }
 
   const removeEntry = (id: string) =>
@@ -55,6 +55,10 @@ export function ExperienceForm({ sectionId }: Props) {
           })}
         </div>
       </div>
+
+      <button onClick={addEntry} className="flex items-center justify-center gap-1.5 rounded-lg border border-dashed border-indigo-700/60 bg-indigo-950/30 py-2.5 text-xs font-medium text-indigo-300 transition-colors hover:border-indigo-500 hover:bg-indigo-950/60">
+        <Plus size={14} /> Agregar experiencia
+      </button>
 
       {data.entries.map((entry, idx) => {
         const headerTitle = entry.title || entry.company || `Experiencia ${idx + 1}`
@@ -117,10 +121,6 @@ export function ExperienceForm({ sectionId }: Props) {
           </div>
         )
       })}
-
-      <button onClick={addEntry} className="flex items-center justify-center gap-1.5 rounded-lg border border-dashed border-indigo-700/60 bg-indigo-950/30 py-2.5 text-xs font-medium text-indigo-300 transition-colors hover:border-indigo-500 hover:bg-indigo-950/60">
-        <Plus size={14} /> Agregar experiencia
-      </button>
     </div>
   )
 }

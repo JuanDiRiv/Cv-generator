@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
+import { Document, Page, View, Text, Link, Image } from '@react-pdf/renderer'
 import { MailIcon, PhoneIcon, MapPinIcon, pdfLinkIcon } from './icons'
 import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
@@ -24,12 +24,17 @@ export function BudapestPDF({ cv }: Props) {
         {/* ── Sidebar ── */}
         <View style={{ width: 195, backgroundColor: '#1a1a2e', padding: 20, flexShrink: 0 }}>
 
-          {/* Avatar */}
-          <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: accent, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-            <Text style={{ color: '#ffffff', fontSize: 17, fontFamily: 'Helvetica-Bold' }}>
-              {contact ? `${contact.firstName?.[0] ?? ''}${contact.lastName?.[0] ?? ''}` : 'CV'}
-            </Text>
-          </View>
+          {/* Avatar: photo or initials */}
+          {contact?.photo ? (
+            // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop
+            <Image src={contact.photo} style={{ width: 52, height: 52, borderRadius: 26, objectFit: 'cover', alignSelf: 'center', marginBottom: 12 }} />
+          ) : (
+            <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: accent, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+              <Text style={{ color: '#ffffff', fontSize: 17, fontFamily: 'Helvetica-Bold' }}>
+                {contact ? `${contact.firstName?.[0] ?? ''}${contact.lastName?.[0] ?? ''}` : 'CV'}
+              </Text>
+            </View>
+          )}
 
           {contact && (
             <View style={{ alignItems: 'center', marginBottom: 14 }}>

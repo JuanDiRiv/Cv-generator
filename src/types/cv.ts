@@ -17,6 +17,8 @@ export interface ContactData {
   phone: string
   location: string
   links: ContactLink[]
+  /** Square JPEG data URL, resized client-side before saving */
+  photo?: string
 }
 
 export interface AboutData {

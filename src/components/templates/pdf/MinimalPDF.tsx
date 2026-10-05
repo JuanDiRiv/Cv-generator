@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, Link } from '@react-pdf/renderer'
+import { Document, Page, View, Text, Link, Image } from '@react-pdf/renderer'
 import { MailIcon, PhoneIcon, MapPinIcon, pdfLinkIcon } from './icons'
 import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
@@ -23,9 +23,15 @@ export function MinimalPDF({ cv }: Props) {
 
         {contact && (
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', borderBottomWidth: 2, borderBottomColor: '#111111', paddingBottom: 10, marginBottom: 14 }}>
-            <View>
-              <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold' }}>{contact.firstName} {contact.lastName}</Text>
-              <Text style={{ fontSize: 10, color: accent, marginTop: 2, fontFamily: 'Helvetica-Bold' }}>{contact.jobTitle}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              {contact.photo && (
+                // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop
+                <Image src={contact.photo} style={{ width: 42, height: 42, borderRadius: 21, objectFit: 'cover', marginRight: 10 }} />
+              )}
+              <View>
+                <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold' }}>{contact.firstName} {contact.lastName}</Text>
+                <Text style={{ fontSize: 10, color: accent, marginTop: 2, fontFamily: 'Helvetica-Bold' }}>{contact.jobTitle}</Text>
+              </View>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
               {contact.email && (

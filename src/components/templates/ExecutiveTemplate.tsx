@@ -28,9 +28,15 @@ export function ExecutiveTemplate({ cv, baselineCV, highlightChanges = false }: 
     <div className="font-sans" style={{ width: '210mm', minHeight: '297mm', background: '#fff' }}>
       {/* Dark header band */}
       <div className="px-8 py-6 flex items-end justify-between" style={{ background: '#1a1a1a' }}>
-        <div>
-          {contact && <h1 className="text-[22px] font-bold text-white tracking-tight">{contact.firstName} {contact.lastName}</h1>}
-          {contact && <p className="text-[10px] font-semibold mt-1 uppercase tracking-widest" style={{ color: accent }}>{contact.jobTitle}</p>}
+        <div className="flex items-center gap-4">
+          {contact?.photo && (
+            // eslint-disable-next-line @next/next/no-img-element -- data URL, nothing to optimize
+            <img src={contact.photo} alt="" className="h-16 w-16 rounded-full object-cover border-2" style={{ borderColor: accent }} />
+          )}
+          <div>
+            {contact && <h1 className="text-[22px] font-bold text-white tracking-tight">{contact.firstName} {contact.lastName}</h1>}
+            {contact && <p className="text-[10px] font-semibold mt-1 uppercase tracking-widest" style={{ color: accent }}>{contact.jobTitle}</p>}
+          </div>
         </div>
         {contact && (
           <div className="text-right text-[8.5px] text-zinc-400 leading-5 flex flex-col items-end gap-0.5">
