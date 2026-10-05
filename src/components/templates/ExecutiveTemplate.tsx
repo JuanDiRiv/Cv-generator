@@ -31,7 +31,7 @@ export function ExecutiveTemplate({ cv, baselineCV, highlightChanges = false }: 
         <div className="flex items-center gap-4">
           {contact?.photo && (
             // eslint-disable-next-line @next/next/no-img-element -- data URL, nothing to optimize
-            <img src={contact.photo} alt="" className="h-16 w-16 rounded-full object-cover border-2" style={{ borderColor: accent }} />
+            <img src={contact.photo} alt="" className="h-20 w-20 rounded-full object-cover border-2" style={{ borderColor: accent }} />
           )}
           <div>
             {contact && <h1 className="text-[22px] font-bold text-white tracking-tight">{contact.firstName} {contact.lastName}</h1>}

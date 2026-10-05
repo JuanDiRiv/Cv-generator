@@ -4,6 +4,7 @@ import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { resolvePdfAccent, withOpacity } from './color'
 import { normalizePdfParagraph } from './text-utils'
+import { singlePageProps, pageMinHeight } from './page'
 
 interface Props { cv: CVDocument }
 
@@ -19,14 +20,14 @@ export function MinimalPDF({ cv }: Props) {
 
   return (
     <Document>
-      <Page size="A4" style={{ fontFamily: 'Helvetica', padding: '14mm 16mm', backgroundColor: '#ffffff', color: '#111111' }}>
+      <Page {...singlePageProps} style={{ ...pageMinHeight, fontFamily: 'Helvetica', padding: '14mm 16mm', backgroundColor: '#ffffff', color: '#111111' }}>
 
         {contact && (
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', borderBottomWidth: 2, borderBottomColor: '#111111', paddingBottom: 10, marginBottom: 14 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               {contact.photo && (
                 // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop
-                <Image src={contact.photo} style={{ width: 42, height: 42, borderRadius: 21, objectFit: 'cover', marginRight: 10 }} />
+                <Image src={contact.photo} style={{ width: 50, height: 50, borderRadius: 25, objectFit: 'cover', marginRight: 10 }} />
               )}
               <View>
                 <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold' }}>{contact.firstName} {contact.lastName}</Text>

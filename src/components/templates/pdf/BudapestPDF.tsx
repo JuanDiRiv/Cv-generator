@@ -4,6 +4,7 @@ import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { resolvePdfAccent, withOpacity } from './color'
 import { normalizePdfParagraph } from './text-utils'
+import { singlePageProps, pageMinHeight } from './page'
 
 interface Props { cv: CVDocument }
 
@@ -19,7 +20,7 @@ export function BudapestPDF({ cv }: Props) {
 
   return (
     <Document>
-      <Page size="A4" style={{ flexDirection: 'row', fontFamily: 'Helvetica', backgroundColor: '#ffffff' }}>
+      <Page {...singlePageProps} style={{ ...pageMinHeight, flexDirection: 'row', fontFamily: 'Helvetica', backgroundColor: '#ffffff' }}>
 
         {/* ── Sidebar ── */}
         <View style={{ width: 195, backgroundColor: '#1a1a2e', padding: 20, flexShrink: 0 }}>
@@ -27,10 +28,10 @@ export function BudapestPDF({ cv }: Props) {
           {/* Avatar: photo or initials */}
           {contact?.photo ? (
             // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop
-            <Image src={contact.photo} style={{ width: 52, height: 52, borderRadius: 26, objectFit: 'cover', alignSelf: 'center', marginBottom: 12 }} />
+            <Image src={contact.photo} style={{ width: 64, height: 64, borderRadius: 32, objectFit: 'cover', alignSelf: 'center', marginBottom: 12 }} />
           ) : (
-            <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: accent, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-              <Text style={{ color: '#ffffff', fontSize: 17, fontFamily: 'Helvetica-Bold' }}>
+            <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: accent, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+              <Text style={{ color: '#ffffff', fontSize: 20, fontFamily: 'Helvetica-Bold' }}>
                 {contact ? `${contact.firstName?.[0] ?? ''}${contact.lastName?.[0] ?? ''}` : 'CV'}
               </Text>
             </View>

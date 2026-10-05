@@ -4,6 +4,7 @@ import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { resolvePdfAccent, withOpacity } from './color'
 import { normalizePdfParagraph } from './text-utils'
+import { singlePageProps, pageMinHeight } from './page'
 
 interface Props { cv: CVDocument }
 
@@ -19,14 +20,14 @@ export function ExecutivePDF({ cv }: Props) {
 
   return (
     <Document>
-      <Page size="A4" style={{ fontFamily: 'Helvetica', backgroundColor: '#ffffff' }}>
+      <Page {...singlePageProps} style={{ ...pageMinHeight, fontFamily: 'Helvetica', backgroundColor: '#ffffff' }}>
 
         {/* ── Dark header ── */}
         <View style={{ backgroundColor: '#1a1a1a', paddingHorizontal: 28, paddingVertical: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             {contact?.photo && (
               // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop
-              <Image src={contact.photo} style={{ width: 48, height: 48, borderRadius: 24, objectFit: 'cover', borderWidth: 1.5, borderColor: accent, marginRight: 12 }} />
+              <Image src={contact.photo} style={{ width: 58, height: 58, borderRadius: 29, objectFit: 'cover', borderWidth: 1.5, borderColor: accent, marginRight: 12 }} />
             )}
             <View>
               <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold', color: '#ffffff' }}>{contact?.firstName} {contact?.lastName}</Text>

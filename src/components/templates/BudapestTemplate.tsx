@@ -35,9 +35,9 @@ export function BudapestTemplate({ cv, baselineCV, highlightChanges = false }: T
         {/* Avatar: photo or initials */}
         {contact?.photo ? (
           // eslint-disable-next-line @next/next/no-img-element -- data URL, nothing to optimize
-          <img src={contact.photo} alt="" className="mx-auto h-16 w-16 rounded-full object-cover" />
+          <img src={contact.photo} alt="" className="mx-auto h-20 w-20 rounded-full object-cover" />
         ) : (
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full text-xl font-bold text-white" style={{ background: accent }}>
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full text-2xl font-bold text-white" style={{ background: accent }}>
             {contact ? `${contact.firstName?.[0] ?? ''}${contact.lastName?.[0] ?? ''}` : 'CV'}
           </div>
         )}

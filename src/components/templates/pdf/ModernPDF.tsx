@@ -4,6 +4,7 @@ import { getPdfLabels } from './labels'
 import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
 import { resolvePdfAccent, withOpacity } from './color'
 import { normalizePdfParagraph } from './text-utils'
+import { singlePageProps, pageMinHeight } from './page'
 
 interface Props { cv: CVDocument }
 
@@ -19,7 +20,7 @@ export function ModernPDF({ cv }: Props) {
 
   return (
     <Document>
-      <Page size="A4" style={{ flexDirection: 'row', fontFamily: 'Helvetica', backgroundColor: '#ffffff' }}>
+      <Page {...singlePageProps} style={{ ...pageMinHeight, flexDirection: 'row', fontFamily: 'Helvetica', backgroundColor: '#ffffff' }}>
 
         {/* ── Colored sidebar ── */}
         <View style={{ width: 190, backgroundColor: accent, padding: 20, flexShrink: 0 }}>
@@ -27,7 +28,7 @@ export function ModernPDF({ cv }: Props) {
             <View style={{ marginBottom: 16 }}>
               {contact.photo && (
                 // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop
-                <Image src={contact.photo} style={{ width: 60, height: 60, borderRadius: 30, objectFit: 'cover', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.4)', marginBottom: 12 }} />
+                <Image src={contact.photo} style={{ width: 72, height: 72, borderRadius: 36, objectFit: 'cover', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.4)', marginBottom: 12 }} />
               )}
               <Text style={{ fontSize: 13, fontFamily: 'Helvetica-Bold', color: '#ffffff', lineHeight: 1.2 }}>{contact.firstName} {contact.lastName}</Text>
               <Text style={{ fontSize: 8, color: 'rgba(255,255,255,0.75)', marginTop: 4 }}>{contact.jobTitle?.toUpperCase()}</Text>

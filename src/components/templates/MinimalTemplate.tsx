@@ -31,7 +31,7 @@ export function MinimalTemplate({ cv, baselineCV, highlightChanges = false }: Te
           <div className="flex items-center gap-3">
             {contact.photo && (
               // eslint-disable-next-line @next/next/no-img-element -- data URL, nothing to optimize
-              <img src={contact.photo} alt="" className="h-14 w-14 rounded-full object-cover" />
+              <img src={contact.photo} alt="" className="h-[68px] w-[68px] rounded-full object-cover" />
             )}
             <div>
               <h1 className="text-[22px] font-bold tracking-tight">{contact.firstName} {contact.lastName}</h1>

@@ -31,7 +31,7 @@ export function ModernTemplate({ cv, baselineCV, highlightChanges = false }: Tem
           <>
             {contact.photo && (
               // eslint-disable-next-line @next/next/no-img-element -- data URL, nothing to optimize
-              <img src={contact.photo} alt="" className="h-20 w-20 rounded-full object-cover border-2 border-white/40" />
+              <img src={contact.photo} alt="" className="h-24 w-24 rounded-full object-cover border-2 border-white/40" />
             )}
             <div>
               <h2 className="text-[13px] font-bold text-white leading-tight">{contact.firstName} {contact.lastName}</h2>
