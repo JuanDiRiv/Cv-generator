@@ -1,7 +1,8 @@
 import { Document, Page, View, Text, Link, Image } from '@react-pdf/renderer'
 import { MailIcon, PhoneIcon, MapPinIcon, pdfLinkIcon } from './icons'
 import { getPdfLabels } from './labels'
-import type { CVDocument, ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
+import type { CVDocument, ContactData, AboutData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
+import { getVisibleExperience } from '@/lib/cv-visibility'
 import { resolvePdfAccent, withOpacity } from './color'
 import { normalizePdfParagraph } from './text-utils'
 import { singlePageProps, pageMinHeight } from './page'
@@ -12,7 +13,7 @@ export function ExecutivePDF({ cv }: Props) {
   const accent = resolvePdfAccent(cv.accentColor)
   const contact = cv.sections.find(s => s.type === 'contact' && s.visible)?.data as ContactData | undefined
   const about = cv.sections.find(s => s.type === 'about' && s.visible)?.data as AboutData | undefined
-  const experience = cv.sections.find(s => s.type === 'experience' && s.visible)?.data as ExperienceData | undefined
+  const experience = getVisibleExperience(cv)
   const skills = cv.sections.find(s => s.type === 'skills' && s.visible)?.data as SkillsData | undefined
   const education = cv.sections.find(s => s.type === 'education' && s.visible)?.data as EducationData | undefined
   const languages = cv.sections.find(s => s.type === 'languages' && s.visible)?.data as LanguagesData | undefined

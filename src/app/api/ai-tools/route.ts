@@ -7,6 +7,7 @@ import type {
   SkillsData,
 } from "@/types/cv";
 import { translateTexts } from "@/lib/translate";
+import { withoutHiddenEntries } from "@/lib/cv-visibility";
 
 export const runtime = "nodejs";
 
@@ -156,11 +157,13 @@ function normalizeModelResponse(
   };
 }
 
-// The profile photo is a base64 data URL: useless to the model and very expensive in tokens
-function stripPhotoForModel(cv: CVDocument): CVDocument {
+// The profile photo is a base64 data URL: useless to the model and very expensive in tokens.
+// Hidden experience entries are dropped so scores and suggestions only reflect the visible CV.
+function prepareCVForModel(cv: CVDocument): CVDocument {
+  const visible = withoutHiddenEntries(cv);
   return {
-    ...cv,
-    sections: cv.sections.map((section) => {
+    ...visible,
+    sections: visible.sections.map((section) => {
       if (section.type !== "contact") return section;
       const data = { ...(section.data as ContactData) };
       delete data.photo;
@@ -376,7 +379,7 @@ async function runCVMode(
         role: "user",
         content: JSON.stringify({
           mode,
-          cv: stripPhotoForModel(cv),
+          cv: prepareCVForModel(cv),
           jobOffer: options.jobOffer ?? null,
           tone: options.tone ?? null,
           targetLanguage: options.language ?? null,
@@ -420,7 +423,7 @@ async function runTextMode(
         role: "user",
         content: JSON.stringify({
           mode,
-          cv: stripPhotoForModel(cv),
+          cv: prepareCVForModel(cv),
           jobOffer: options.jobOffer ?? null,
         }),
       },

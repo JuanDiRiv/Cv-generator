@@ -20,12 +20,14 @@ interface SortableEntryCardProps {
   subtitle: string
   dates: string
   open: boolean
+  hidden: boolean
   onToggle: () => void
+  onToggleHidden: () => void
   onRemove: () => void
   children: React.ReactNode
 }
 
-function SortableEntryCard({ id, title, subtitle, dates, open, onToggle, onRemove, children }: SortableEntryCardProps) {
+function SortableEntryCard({ id, title, subtitle, dates, open, hidden, onToggle, onToggleHidden, onRemove, children }: SortableEntryCardProps) {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id })
 
   const style = {
@@ -57,14 +59,28 @@ function SortableEntryCard({ id, title, subtitle, dates, open, onToggle, onRemov
             type="button"
             onClick={onToggle}
             aria-expanded={open}
-            className="min-w-0 flex-1 text-left"
+            className={`min-w-0 flex-1 text-left transition-opacity ${hidden ? 'opacity-50' : ''}`}
           >
-            <p className="truncate text-xs font-semibold text-zinc-200">{title}</p>
+            <p className="truncate text-xs font-semibold text-zinc-200">
+              {title}
+              {hidden && <span className="ml-1.5 rounded bg-zinc-800 px-1 py-px text-[9px] font-medium uppercase tracking-wider text-zinc-400">Oculta</span>}
+            </p>
             {subtitle && <p className="truncate text-[10px] text-zinc-500">{subtitle}</p>}
             {!open && dates && <p className="truncate text-[10px] text-zinc-600">{dates}</p>}
           </button>
         </div>
         <div className="flex shrink-0 items-center">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={!hidden}
+            onClick={onToggleHidden}
+            title={hidden ? 'Mostrar en el CV' : 'Ocultar del CV'}
+            aria-label={hidden ? 'Mostrar experiencia en el CV' : 'Ocultar experiencia del CV'}
+            className={`relative mr-1 h-4 w-7 shrink-0 rounded-full transition-colors ${hidden ? 'bg-zinc-700' : 'bg-indigo-600'}`}
+          >
+            <span className={`absolute top-0.5 left-0.5 h-3 w-3 rounded-full bg-white shadow transition-transform ${hidden ? '' : 'translate-x-3'}`} />
+          </button>
           <button
             onClick={onRemove}
             className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover/entry:opacity-100"
@@ -179,7 +195,9 @@ export function ExperienceForm({ sectionId }: Props) {
                   subtitle={headerSub}
                   dates={dates}
                   open={openIds.has(entry.id)}
+                  hidden={!!entry.hidden}
                   onToggle={() => toggleEntry(entry.id)}
+                  onToggleHidden={() => updateEntry(entry.id, 'hidden', !entry.hidden)}
                   onRemove={() => removeEntry(entry.id)}
                 >
                   <div className="flex gap-2">

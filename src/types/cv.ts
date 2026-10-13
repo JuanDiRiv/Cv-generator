@@ -34,6 +34,8 @@ export interface ExperienceEntry {
   endDate: string
   current: boolean
   description: string
+  /** Kept in the editor but left out of the rendered CV */
+  hidden?: boolean
 }
 
 export interface ExperienceData {

@@ -1,4 +1,5 @@
-import type { ExperienceData, SkillsData, EducationData, LanguagesData, ContactData, AboutData } from '@/types/cv'
+import type { SkillsData, EducationData, LanguagesData, ContactData, AboutData } from '@/types/cv'
+import { getVisibleExperience } from '@/lib/cv-visibility'
 import { Mail, Phone, MapPin, Globe, X, Link as LinkIcon } from 'lucide-react'
 import { DiffText, getBaselineTextMaps } from './highlight'
 import type { TemplateProps } from './index'
@@ -15,7 +16,7 @@ export function BudapestTemplate({ cv, baselineCV, highlightChanges = false }: T
 
   const contact = cv.sections.find(s => s.type === 'contact' && s.visible)?.data as ContactData | undefined
   const about = cv.sections.find(s => s.type === 'about' && s.visible)?.data as AboutData | undefined
-  const experience = cv.sections.find(s => s.type === 'experience' && s.visible)?.data as ExperienceData | undefined
+  const experience = getVisibleExperience(cv)
   const skills = cv.sections.find(s => s.type === 'skills' && s.visible)?.data as SkillsData | undefined
   const education = cv.sections.find(s => s.type === 'education' && s.visible)?.data as EducationData | undefined
   const languages = cv.sections.find(s => s.type === 'languages' && s.visible)?.data as LanguagesData | undefined

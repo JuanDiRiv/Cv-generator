@@ -1,4 +1,5 @@
-import type { ContactData, AboutData, ExperienceData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
+import type { ContactData, AboutData, SkillsData, EducationData, LanguagesData } from '@/types/cv'
+import { getVisibleExperience } from '@/lib/cv-visibility'
 import { Mail, Phone, MapPin, Globe, X, Link as LinkIcon } from 'lucide-react'
 import { DiffText, getBaselineTextMaps } from './highlight'
 import type { TemplateProps } from './index'
@@ -14,7 +15,7 @@ export function MinimalTemplate({ cv, baselineCV, highlightChanges = false }: Te
   const accent = cv.accentColor || '#6366f1'
   const contact = cv.sections.find(s => s.type === 'contact' && s.visible)?.data as ContactData | undefined
   const about = cv.sections.find(s => s.type === 'about' && s.visible)?.data as AboutData | undefined
-  const experience = cv.sections.find(s => s.type === 'experience' && s.visible)?.data as ExperienceData | undefined
+  const experience = getVisibleExperience(cv)
   const skills = cv.sections.find(s => s.type === 'skills' && s.visible)?.data as SkillsData | undefined
   const education = cv.sections.find(s => s.type === 'education' && s.visible)?.data as EducationData | undefined
   const languages = cv.sections.find(s => s.type === 'languages' && s.visible)?.data as LanguagesData | undefined
