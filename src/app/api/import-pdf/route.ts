@@ -1,10 +1,10 @@
-import OpenAI from "openai";
 import { normalizeImportedCV, type ImportedCVPayload } from "@/lib/cv-import";
+import { generateJSON, type AIPdfInput } from "@/lib/ai/client";
+import { missingAIKeyMessage } from "@/lib/ai/config";
 
 export const runtime = "nodejs";
 
 const MAX_PDF_SIZE_BYTES = 8 * 1024 * 1024;
-const IMPORT_MODEL = "gpt-6-luna";
 
 const BASE_SYSTEM_PROMPT =
   'You are an expert resume parser. Convert the provided raw PDF text into a strict JSON object for a CV editor. Do not include markdown. Do not include explanations. Never invent details that are not present in the text. If data is missing, return empty strings or empty arrays. Preserve full wording for summaries and descriptions: do not summarize, do not shorten, do not paraphrase. Keep all bullet points and line breaks when present. Output object keys exactly: language, title, contact, about, experience, education, skills, languages. language must be "es" or "en". contact fields: firstName,lastName,jobTitle,email,phone,location,links[{label,url}]. about: {summary}. experience: {displayMode, entries[{title,company,location,startDate,endDate,current,description}]}. education: {entries[{degree,institution,startDate,endDate,description}]}. skills: {displayMode, chips[string], categories[{name,skills[string]}]}. languages: {entries[{language,level}]}. IMPORTANT for experience: create one entry per distinct role/company/date range; never merge multiple jobs into one entry even if the PDF text is continuous.';
@@ -194,43 +194,15 @@ function mergeImportedPayload(
 }
 
 async function requestImportedCV(
-  client: OpenAI,
-  uploadedFileId: string,
+  pdf: AIPdfInput,
   userPrompt: string,
 ): Promise<ImportedCVPayload> {
-  const completion = await client.chat.completions.create({
-    model: IMPORT_MODEL,
-    max_completion_tokens: 12000,
-    response_format: { type: "json_object" },
-    messages: [
-      {
-        role: "system",
-        content: BASE_SYSTEM_PROMPT,
-      },
-      {
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: userPrompt,
-          },
-          {
-            type: "file",
-            file: {
-              file_id: uploadedFileId,
-            },
-          },
-        ],
-      },
-    ],
+  const parsed = await generateJSON({
+    system: BASE_SYSTEM_PROMPT,
+    user: userPrompt,
+    pdf,
+    maxTokens: 32000,
   });
-
-  const content = completion.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error("OpenAI returned empty response");
-  }
-
-  const parsed = JSON.parse(content);
   return normalizeImportedCV(parsed);
 }
 
@@ -252,52 +224,36 @@ function hasMeaningfulImportedData(
   );
 }
 
-async function extractStructuredCV(pdfFile: File, apiKey: string) {
-  const client = new OpenAI({ apiKey });
-  const uploadedFile = await client.files.create({
-    file: pdfFile,
-    purpose: "user_data",
-  });
+async function extractStructuredCV(pdfFile: File) {
+  const pdf: AIPdfInput = {
+    base64: Buffer.from(await pdfFile.arrayBuffer()).toString("base64"),
+    filename: pdfFile.name || "cv.pdf",
+  };
+
+  const primary = await requestImportedCV(pdf, BASE_USER_PROMPT);
+
+  if (!shouldRunRecovery(primary)) {
+    return primary;
+  }
+
+  const hints = getRecoveryHints(primary);
+  const recoveryPrompt = `${BASE_USER_PROMPT} Re-read the same PDF and focus especially on missing or weak sections: ${
+    hints.join(", ") || "all sections"
+  }. Return complete JSON with the same schema and keep bullets in experience descriptions.`;
 
   try {
-    const primary = await requestImportedCV(
-      client,
-      uploadedFile.id,
-      BASE_USER_PROMPT,
-    );
-
-    if (!shouldRunRecovery(primary)) {
-      return primary;
-    }
-
-    const hints = getRecoveryHints(primary);
-    const recoveryPrompt = `${BASE_USER_PROMPT} Re-read the same PDF and focus especially on missing or weak sections: ${
-      hints.join(", ") || "all sections"
-    }. Return complete JSON with the same schema and keep bullets in experience descriptions.`;
-
-    try {
-      const recovery = await requestImportedCV(
-        client,
-        uploadedFile.id,
-        recoveryPrompt,
-      );
-      return mergeImportedPayload(primary, recovery);
-    } catch {
-      return primary;
-    }
-  } finally {
-    void client.files.delete(uploadedFile.id).catch(() => undefined);
+    const recovery = await requestImportedCV(pdf, recoveryPrompt);
+    return mergeImportedPayload(primary, recovery);
+  } catch {
+    return primary;
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      return Response.json(
-        { error: "Missing OPENAI_API_KEY" },
-        { status: 500 },
-      );
+    const missingKey = missingAIKeyMessage();
+    if (missingKey) {
+      return Response.json({ error: missingKey }, { status: 500 });
     }
 
     const formData = await request.formData();
@@ -319,7 +275,7 @@ export async function POST(request: Request) {
       return Response.json({ error: "File must be a PDF" }, { status: 400 });
     }
 
-    const imported = await extractStructuredCV(file, apiKey);
+    const imported = await extractStructuredCV(file);
     if (!hasMeaningfulImportedData(imported)) {
       return Response.json(
         { error: "No se pudo extraer contenido útil del PDF" },

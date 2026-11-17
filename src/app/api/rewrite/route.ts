@@ -1,4 +1,5 @@
-import OpenAI from "openai";
+import { generateJSON } from "@/lib/ai/client";
+import { missingAIKeyMessage } from "@/lib/ai/config";
 
 export const runtime = "nodejs";
 
@@ -15,8 +16,6 @@ interface RewriteRequest {
     jobTitle?: string;
   };
 }
-
-const MODEL = "gpt-6-luna";
 
 const LANGUAGE_LABEL: Record<string, string> = {
   es: "español",
@@ -71,12 +70,9 @@ function buildPrompt(
 
 export async function POST(request: Request) {
   try {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      return Response.json(
-        { error: "Missing OPENAI_API_KEY" },
-        { status: 500 },
-      );
+    const missingKey = missingAIKeyMessage();
+    if (missingKey) {
+      return Response.json({ error: missingKey }, { status: 500 });
     }
 
     const body = (await request.json()) as RewriteRequest;
@@ -103,25 +99,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const client = new OpenAI({ apiKey });
-    const completion = await client.chat.completions.create({
-      model: MODEL,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: buildPrompt(field, language, body.context) },
-        { role: "user", content: text },
-      ],
+    const parsed = await generateJSON<{ text?: unknown }>({
+      system: buildPrompt(field, language, body.context),
+      user: text,
     });
-
-    const content = completion.choices[0]?.message?.content;
-    if (!content) {
-      return Response.json(
-        { error: "OpenAI devolvió respuesta vacía" },
-        { status: 502 },
-      );
-    }
-
-    const parsed = JSON.parse(content) as { text?: unknown };
     let rewritten = typeof parsed.text === "string" ? parsed.text.trim() : "";
 
     if (!rewritten) {

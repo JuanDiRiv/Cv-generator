@@ -1,4 +1,5 @@
 import { translateTexts } from "@/lib/translate";
+import { missingAIKeyMessage } from "@/lib/ai/config";
 import type {
   CVDocument,
   ExperienceData,
@@ -9,9 +10,8 @@ import type {
 export async function POST(request: Request) {
   const { cv, targetLang }: { cv: CVDocument; targetLang: "es" | "en" } =
     await request.json();
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey)
-    return Response.json({ error: "Missing OPENAI_API_KEY" }, { status: 500 });
+  const missingKey = missingAIKeyMessage();
+  if (missingKey) return Response.json({ error: missingKey }, { status: 500 });
 
   const translationLang = targetLang.toUpperCase() as "EN" | "ES";
 
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
   if (texts.length === 0) return Response.json(translated);
 
-  const results = await translateTexts(texts, translationLang, apiKey);
+  const results = await translateTexts(texts, translationLang);
 
   // Re-assign in same order
   let i = 0;

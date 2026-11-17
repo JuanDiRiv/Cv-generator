@@ -1,4 +1,5 @@
-import OpenAI from "openai";
+import { generateJSON } from "@/lib/ai/client";
+import { missingAIKeyMessage } from "@/lib/ai/config";
 import type {
   CVDocument,
   AboutData,
@@ -365,33 +366,20 @@ function buildTextSystemPrompt(
 }
 
 async function runCVMode(
-  client: OpenAI,
   mode: ToolMode,
   cv: CVDocument,
   options: { jobOffer?: string; tone?: string; language?: string },
 ) {
-  const completion = await client.chat.completions.create({
-    model: "gpt-6-luna",
-    response_format: { type: "json_object" },
-    messages: [
-      { role: "system", content: buildCVSystemPrompt(mode, options) },
-      {
-        role: "user",
-        content: JSON.stringify({
-          mode,
-          cv: prepareCVForModel(cv),
-          jobOffer: options.jobOffer ?? null,
-          tone: options.tone ?? null,
-          targetLanguage: options.language ?? null,
-        }),
-      },
-    ],
+  const parsed = await generateJSON<AIModelResponse>({
+    system: buildCVSystemPrompt(mode, options),
+    user: JSON.stringify({
+      mode,
+      cv: prepareCVForModel(cv),
+      jobOffer: options.jobOffer ?? null,
+      tone: options.tone ?? null,
+      targetLanguage: options.language ?? null,
+    }),
   });
-
-  const content = completion.choices[0]?.message?.content;
-  if (!content) throw new Error("OpenAI returned empty response");
-
-  const parsed = JSON.parse(content) as AIModelResponse;
   const normalized = normalizeModelResponse(parsed, mode);
   const suggestedCV = applyAIChanges(cv, normalized.changes);
 
@@ -409,31 +397,18 @@ async function runCVMode(
 }
 
 async function runTextMode(
-  client: OpenAI,
   mode: ToolMode,
   cv: CVDocument,
   options: { jobOffer?: string; language?: string },
 ) {
-  const completion = await client.chat.completions.create({
-    model: "gpt-6-luna",
-    response_format: { type: "json_object" },
-    messages: [
-      { role: "system", content: buildTextSystemPrompt(mode, options) },
-      {
-        role: "user",
-        content: JSON.stringify({
-          mode,
-          cv: prepareCVForModel(cv),
-          jobOffer: options.jobOffer ?? null,
-        }),
-      },
-    ],
+  const parsed = await generateJSON<AITextModelResponse>({
+    system: buildTextSystemPrompt(mode, options),
+    user: JSON.stringify({
+      mode,
+      cv: prepareCVForModel(cv),
+      jobOffer: options.jobOffer ?? null,
+    }),
   });
-
-  const content = completion.choices[0]?.message?.content;
-  if (!content) throw new Error("OpenAI returned empty response");
-
-  const parsed = JSON.parse(content) as AITextModelResponse;
   const title =
     typeof parsed.title === "string" && parsed.title.trim()
       ? parsed.title.trim()
@@ -443,7 +418,7 @@ async function runTextMode(
       ? parsed.content.trim()
       : "";
 
-  if (!text) throw new Error("OpenAI returned empty content");
+  if (!text) throw new Error("El modelo devolvió contenido vacío");
 
   return {
     kind: "text" as const,
@@ -469,7 +444,6 @@ function defaultTextTitle(mode: ToolMode): string {
 }
 
 async function runTranslateMode(
-  apiKey: string,
   cv: CVDocument,
   targetLang: "EN" | "ES",
 ): Promise<{
@@ -517,7 +491,6 @@ async function runTranslateMode(
   const translated = await translateTexts(
     buckets.map((b) => b.text),
     targetLang,
-    apiKey,
   );
 
   buckets.forEach((b, i) => {
@@ -547,12 +520,9 @@ async function runTranslateMode(
 
 export async function POST(request: Request) {
   try {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      return Response.json(
-        { error: "Missing OPENAI_API_KEY" },
-        { status: 500 },
-      );
+    const missingKey = missingAIKeyMessage();
+    if (missingKey) {
+      return Response.json({ error: missingKey }, { status: 500 });
     }
 
     const {
@@ -596,8 +566,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const client = new OpenAI({ apiKey });
-
     const languageName =
       language === "EN" || language === "en"
         ? "English"
@@ -607,12 +575,12 @@ export async function POST(request: Request) {
 
     if (mode === "translate") {
       const target: "EN" | "ES" = language === "ES" ? "ES" : "EN";
-      const result = await runTranslateMode(apiKey, cv, target);
+      const result = await runTranslateMode(cv, target);
       return Response.json(result);
     }
 
     if (CV_TOOLS.has(mode)) {
-      const result = await runCVMode(client, mode, cv, {
+      const result = await runCVMode(mode, cv, {
         jobOffer,
         tone,
         language: languageName,
@@ -621,7 +589,7 @@ export async function POST(request: Request) {
     }
 
     if (TEXT_TOOLS.has(mode)) {
-      const result = await runTextMode(client, mode, cv, {
+      const result = await runTextMode(mode, cv, {
         jobOffer,
         language: languageName,
       });
